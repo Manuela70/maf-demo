@@ -1,0 +1,389 @@
+/**
+ * MAF Perú - Estilos Custom
+ * Estilos que complementan Tailwind CSS
+ * 
+ * Paleta de colores oficial MAF (extraída de mockups oficiales)
+ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VARIABLES CSS — PALETA MAF OFICIAL
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Colores primarios de marca */
+  --maf-rojo-primario: #E00020;      /* Botones CTA, wordmark, alertas */
+  --maf-celeste-acento: #80C8E0;     /* Headers de sección, progreso, elementos activos */
+  --maf-rosa-pastel: #FFDDDD;        /* Botones secundarios, headers alternos */
+  
+  /* Estados */
+  --maf-verde-exito: #90E0A8;        /* Badge Pagado/Normal, estado positivo */
+  --maf-amarillo-pendiente: #F0B828; /* Badge Pendiente, advertencias */
+  
+  /* Grises de sistema */
+  --maf-gris-oscuro: #1B1A18;        /* Texto principal */
+  --maf-gris-medio: #555555;         /* Texto secundario, placa logo */
+  --maf-gris-borde: #D1D0D0;         /* Bordes de inputs y cards */
+  --maf-gris-fondo-claro: #FAFAFA;   /* Fondo de página */
+  --maf-gris-fondo: #F3F1F1;         /* Fondo de cards deshabilitadas */
+  --maf-gris-fondo-medio: #E6E2E2;   /* Fondo de inputs deshabilitados */
+  
+  /* Logo */
+  --maf-logo-placa: #555555;         /* Fondo "Fondos Colectivos" */
+  --maf-logo-barra: #82CCE5;         /* Barra divisoria vertical */
+  --maf-logo-wordmark: #E30221;      /* Wordmark "maf" */
+  
+  /* Sombras */
+  --maf-sombra-card: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --maf-sombra-card-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ESTILOS BASE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+  background: var(--maf-gris-fondo-claro);
+  color: var(--maf-gris-oscuro);
+  margin: 0;
+  padding: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   COMPONENTES CUSTOM
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Sidebar */
+.sidebar-scroll {
+  overflow-y: auto;
+  max-height: calc(100vh - 64px);
+}
+
+/* Animaciones */
+.animate-pulse-custom {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Input OTP */
+.otp-input {
+  width: 40px;
+  height: 48px;
+  text-align: center;
+  font-size: 20px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  outline: none;
+}
+
+.otp-input:focus {
+  border-color: #374151;
+  box-shadow: 0 0 0 2px #d1d5db;
+}
+
+/* Progress Pipeline */
+.step-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.step-line {
+  height: 2px;
+  flex: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   HIGHLIGHTS DE CAMBIOS (12-06-2026)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.hl-jun12 {
+  background-color: #fef08a;
+  padding: 1px 3px;
+  border-radius: 2px;
+  font-weight: 500;
+}
+
+.badge-new {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #78350f;
+  font-weight: 700;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-left: 6px;
+  text-transform: uppercase;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  border: 1px solid #d97706;
+}
+
+.highlight-box {
+  background: #fef3c7;
+  border: 2px solid #fbbf24;
+  border-radius: 6px;
+  padding: 12px;
+  margin: 12px 0;
+}
+
+.highlight-box-title {
+  font-weight: 700;
+  color: #92400e;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.highlight-item {
+  background: #fffbeb;
+  border-left: 4px solid #f59e0b;
+  padding: 8px 12px;
+  margin: 8px 0;
+  font-size: 12px;
+  color: #78350f;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   COMPONENTES MAF — Según Reglas de Diseño Oficiales
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Botones Primarios — Rojo sólido, pill shape */
+.btn-maf-primary {
+  background-color: var(--maf-rojo-primario);
+  color: white;
+  font-weight: 700;
+  padding: 10px 24px;
+  border-radius: 9999px; /* pill */
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.btn-maf-primary:hover {
+  background-color: #c00018;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(224, 0, 32, 0.3);
+}
+
+.btn-maf-primary:active {
+  transform: translateY(0);
+}
+
+.btn-maf-primary:disabled {
+  background-color: var(--maf-gris-fondo-medio);
+  color: var(--maf-gris-borde);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Botones Secundarios — Rosa pastel o gris, pill shape */
+.btn-maf-secondary {
+  background-color: var(--maf-rosa-pastel);
+  color: var(--maf-gris-oscuro);
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 9999px; /* pill */
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.btn-maf-secondary:hover {
+  background-color: #ffc0c0;
+  transform: translateY(-1px);
+}
+
+.btn-maf-secondary.gris {
+  background-color: var(--maf-gris-fondo);
+  color: var(--maf-gris-oscuro);
+}
+
+.btn-maf-secondary.gris:hover {
+  background-color: var(--maf-gris-fondo-medio);
+}
+
+/* Cards/Panels — Fondo blanco, bordes redondeados, sombra suave */
+.card-maf {
+  background-color: white !important;
+  border-radius: 12px !important;
+  box-shadow: var(--maf-sombra-card) !important;
+  padding: 20px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  border: none !important;
+}
+
+.card-maf:hover {
+  box-shadow: var(--maf-sombra-card-hover);
+}
+
+/* Header de card con barra de acento (celeste o rosa) */
+.card-maf-header {
+  background-color: var(--maf-celeste-acento);
+  color: var(--maf-gris-oscuro);
+  font-weight: 700;
+  font-size: 16px;
+  padding: 12px 20px;
+  border-radius: 12px 12px 0 0;
+  margin: -20px -20px 20px -20px;
+}
+
+.card-maf-header.rosa {
+  background-color: var(--maf-rosa-pastel);
+}
+
+/* Variante sin margin negativo (para cards con contenido dinámico) */
+.card-maf-header.no-margin {
+  margin: 0;
+  border-radius: 12px 12px 0 0;
+}
+
+/* Cuando el header es el último hijo (card contraída), redondear todo */
+.card-maf-header.no-margin:last-child {
+  border-radius: 12px;
+  margin-bottom: 0;
+}
+
+/* Badges de Estado — Pill pequeño con colores según estado */
+.badge-maf {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 9999px; /* pill */
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.badge-maf.pagado,
+.badge-maf.normal,
+.badge-maf.exito {
+  background-color: var(--maf-verde-exito);
+  color: #1b5e20;
+}
+
+.badge-maf.pendiente,
+.badge-maf.advertencia {
+  background-color: var(--maf-amarillo-pendiente);
+  color: #7c4a00;
+}
+
+.badge-maf.cancelado,
+.badge-maf.error {
+  background-color: var(--maf-rojo-primario);
+  color: white;
+}
+
+.badge-maf.gris,
+.badge-maf.inactivo {
+  background-color: var(--maf-gris-fondo-medio);
+  color: var(--maf-gris-medio);
+}
+
+/* Inputs — Bordes redondeados 8-10px, borde celeste en focus */
+.input-maf {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--maf-gris-borde);
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--maf-gris-oscuro);
+  background-color: white;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.input-maf::placeholder {
+  color: var(--maf-gris-medio);
+  opacity: 0.7;
+}
+
+.input-maf:focus {
+  border-color: var(--maf-celeste-acento);
+  box-shadow: 0 0 0 3px rgba(128, 200, 224, 0.2);
+}
+
+.input-maf:disabled {
+  background-color: var(--maf-gris-fondo);
+  cursor: not-allowed;
+}
+
+/* Select — Mismo estilo que input */
+.select-maf {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--maf-gris-borde);
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--maf-gris-oscuro);
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.select-maf:focus {
+  border-color: var(--maf-celeste-acento);
+  box-shadow: 0 0 0 3px rgba(128, 200, 224, 0.2);
+}
+
+/* Anillo de Progreso — Donut chart con color celeste */
+.progress-ring {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.progress-ring-circle {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+.progress-ring-background {
+  stroke: var(--maf-gris-fondo-medio);
+}
+
+.progress-ring-progress {
+  stroke: var(--maf-celeste-acento);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+.progress-ring-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.progress-ring-percent {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--maf-gris-oscuro);
+  line-height: 1;
+}
+
+.progress-ring-label {
+  font-size: 12px;
+  color: var(--maf-gris-medio);
+  margin-top: 4px;
+}
