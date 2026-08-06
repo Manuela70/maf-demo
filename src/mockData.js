@@ -19,20 +19,20 @@ export const VENDEDORES = [
     nombreCompleto: 'Juan Pérez',
     sucursal: 'Surco',
     metaDiaria: 3,
-    metaMensual: 60,
-    ventasMes: 14,
-    evaluacionesMes: 28,
-    tasaEfectividad: 0.50, // 50%
-    leadsActivos: 12,
-    leadsSinMovimiento: 1,
+    metaMensual: 8,
+    ventasMes: 6,
+    evaluacionesMes: 18,
+    tasaEfectividad: 0.33, // 33%
+    leadsActivos: 15,
+    leadsSinMovimiento: 4,
     ultimaActividad: new Date('2026-08-02T16:30:00'),
     estado: 'activo',
     // NUEVAS MÉTRICAS (05-AGO-2026)
-    citasGeneradas: 32,
-    citasMeta: 40,
-    evaluacionesEquifax: 28, // Mismo que evaluacionesMes
-    evaluacionesMeta: 30,
-    certificadosEmitidos: 14, // Igual a ventasMes
+    citasGeneradas: 12,
+    citasMeta: 15,
+    evaluacionesEquifax: 18,
+    evaluacionesMeta: 25,
+    certificadosEmitidos: 14,
     ticketPromedio: 24100, // USD - por encima de meta ($23,500)
     ticketMeta: 23500,
     // Derivaciones diarias (NUEVO 06-AGO-2026)
@@ -45,19 +45,19 @@ export const VENDEDORES = [
     nombreCompleto: 'María Díaz',
     sucursal: 'Surco',
     metaDiaria: 3,
-    metaMensual: 60,
-    ventasMes: 11,
-    evaluacionesMes: 24,
-    tasaEfectividad: 0.46,
-    leadsActivos: 10,
-    leadsSinMovimiento: 0,
+    metaMensual: 8,
+    ventasMes: 4,
+    evaluacionesMes: 15,
+    tasaEfectividad: 0.27,
+    leadsActivos: 12,
+    leadsSinMovimiento: 3,
     ultimaActividad: new Date('2026-08-02T15:45:00'),
     estado: 'activo',
     // NUEVAS MÉTRICAS
-    citasGeneradas: 28,
-    citasMeta: 40,
-    evaluacionesEquifax: 24,
-    evaluacionesMeta: 30,
+    citasGeneradas: 10,
+    citasMeta: 15,
+    evaluacionesEquifax: 15,
+    evaluacionesMeta: 25,
     certificadosEmitidos: 11,
     ticketPromedio: 22800, // Ligeramente por debajo de meta
     ticketMeta: 23500,
@@ -70,19 +70,19 @@ export const VENDEDORES = [
     nombreCompleto: 'Luis Vega',
     sucursal: 'Surco',
     metaDiaria: 3,
-    metaMensual: 60,
-    ventasMes: 9,
-    evaluacionesMes: 22,
-    tasaEfectividad: 0.41,
+    metaMensual: 8,
+    ventasMes: 3,
+    evaluacionesMes: 12,
+    tasaEfectividad: 0.25,
     leadsActivos: 11,
     leadsSinMovimiento: 2,
     ultimaActividad: new Date('2026-08-02T14:20:00'),
     estado: 'activo',
     // NUEVAS MÉTRICAS
-    citasGeneradas: 25,
-    citasMeta: 40,
-    evaluacionesEquifax: 22,
-    evaluacionesMeta: 30,
+    citasGeneradas: 8,
+    citasMeta: 15,
+    evaluacionesEquifax: 12,
+    evaluacionesMeta: 25,
     certificadosEmitidos: 9,
     ticketPromedio: 25200, // Buen ticket promedio
     ticketMeta: 23500,
@@ -95,19 +95,19 @@ export const VENDEDORES = [
     nombreCompleto: 'Carmen Rojas',
     sucursal: 'Surco',
     metaDiaria: 3,
-    metaMensual: 60,
-    ventasMes: 8,
-    evaluacionesMes: 20,
-    tasaEfectividad: 0.40,
+    metaMensual: 8,
+    ventasMes: 3,
+    evaluacionesMes: 10,
+    tasaEfectividad: 0.30,
     leadsActivos: 9,
     leadsSinMovimiento: 1,
     ultimaActividad: new Date('2026-08-02T13:10:00'),
     estado: 'activo',
     // NUEVAS MÉTRICAS
-    citasGeneradas: 23,
-    citasMeta: 40,
-    evaluacionesEquifax: 20,
-    evaluacionesMeta: 30,
+    citasGeneradas: 9,
+    citasMeta: 15,
+    evaluacionesEquifax: 10,
+    evaluacionesMeta: 25,
     certificadosEmitidos: 8,
     ticketPromedio: 21500, // Por debajo de meta - requiere mejorar
     ticketMeta: 23500,
@@ -120,19 +120,19 @@ export const VENDEDORES = [
     nombreCompleto: 'Pedro Núñez',
     sucursal: 'Surco',
     metaDiaria: 3,
-    metaMensual: 60,
-    ventasMes: 10,
-    evaluacionesMes: 25,
-    tasaEfectividad: 0.40,
+    metaMensual: 8,
+    ventasMes: 5,
+    evaluacionesMes: 16,
+    tasaEfectividad: 0.31,
     leadsActivos: 13,
     leadsSinMovimiento: 3,
     ultimaActividad: new Date('2026-08-02T12:00:00'),
     estado: 'activo',
     // NUEVAS MÉTRICAS
-    citasGeneradas: 30,
-    citasMeta: 40,
-    evaluacionesEquifax: 25,
-    evaluacionesMeta: 30,
+    citasGeneradas: 13,
+    citasMeta: 15,
+    evaluacionesEquifax: 16,
+    evaluacionesMeta: 25,
     certificadosEmitidos: 10,
     ticketPromedio: 23800, // Cerca de meta
     ticketMeta: 23500,
@@ -145,64 +145,24 @@ export const VENDEDORES = [
     nombreCompleto: 'Roberto Soto',
     sucursal: 'Surco',
     metaDiaria: 3,
-    metaMensual: 60,
-    ventasMes: 6,
-    evaluacionesMes: 18,
-    tasaEfectividad: 0.33,
+    metaMensual: 8,
+    ventasMes: 2,
+    evaluacionesMes: 8,
+    tasaEfectividad: 0.25,
     leadsActivos: 15,
     leadsSinMovimiento: 9, // Bajo desempeño
     ultimaActividad: new Date('2026-07-30T17:00:00'), // 3 días sin actividad
     estado: 'activo',
     // NUEVAS MÉTRICAS
-    citasGeneradas: 18,
-    citasMeta: 40,
-    evaluacionesEquifax: 18,
-    evaluacionesMeta: 30,
+    citasGeneradas: 6,
+    citasMeta: 15,
+    evaluacionesEquifax: 8,
+    evaluacionesMeta: 25,
     certificadosEmitidos: 6,
     ticketPromedio: 19800, // Muy por debajo de meta - CRÍTICO
     ticketMeta: 23500,
     derivacionesDiarias: 2, // MUY por debajo - crítico
     derivacionesMeta: 5
-  }
-];
-
-// ═══════════════════════════════════════════════════════════════════════════
-// SUCURSALES
-// ═══════════════════════════════════════════════════════════════════════════
-
-export const SUCURSALES = [
-  {
-    id: 's1',
-    nombre: 'Surco',
-    ciudad: 'Lima',
-    zona: 'Lima Sur',
-    ventasMes: 58,
-    metaMensual: 360,
-    tasaEfectividad: 0.046,
-    asesoresActivos: 6,
-    leadsSinGestion: 9
-  },
-  {
-    id: 's2',
-    nombre: 'Miraflores',
-    ciudad: 'Lima',
-    zona: 'Lima Centro',
-    ventasMes: 42,
-    metaMensual: 300,
-    tasaEfectividad: 0.038,
-    asesoresActivos: 5,
-    leadsSinGestion: 12
-  },
-  {
-    id: 's3',
-    nombre: 'San Isidro',
-    ciudad: 'Lima',
-    zona: 'Lima Centro',
-    ventasMes: 51,
-    metaMensual: 330,
-    tasaEfectividad: 0.044,
-    asesoresActivos: 5,
-    leadsSinGestion: 7
   }
 ];
 
@@ -228,6 +188,126 @@ export const DEALERS = [
   { id: 'd3', nombre: 'ToyotaSur - Surco', ciudad: 'Lima', zona: 'Lima Sur' },
   { id: 'd4', nombre: 'Motored - San Miguel', ciudad: 'Lima', zona: 'Lima Norte' },
   { id: 'd5', nombre: 'Breña Motors - Breña', ciudad: 'Lima', zona: 'Lima Centro' }
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SUPERVISORES (NUEVO 06-AGO-2026)
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const SUPERVISORES = [
+  {
+    id: 'sup1',
+    nombre: 'Carlos Mendoza',
+    sucursal: 'Surco',
+    ventasMes: 23,
+    metaMensual: 48,
+    asesoresACargo: 6,
+    citasGeneradas: 58,
+    evaluacionesEquifax: 79
+  },
+  {
+    id: 'sup2',
+    nombre: 'Patricia Luna',
+    sucursal: 'San Isidro',
+    ventasMes: 18,
+    metaMensual: 40,
+    asesoresACargo: 5,
+    citasGeneradas: 45,
+    evaluacionesEquifax: 62
+  }
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SUCURSALES (NUEVO 06-AGO-2026)
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const SUCURSALES = [
+  {
+    id: 's1',
+    nombre: 'Surco',
+    zona: 'Lima Sur',
+    asesores: 6,
+    supervisores: 1,
+    ventasMes: 23,
+    metaMensual: 48,
+    leadsActivos: 89,
+    citasGeneradas: 58,
+    evaluacionesEquifax: 79,
+    ticketPromedio: 23100
+  },
+  {
+    id: 's2',
+    nombre: 'San Isidro',
+    zona: 'Lima Centro',
+    asesores: 5,
+    supervisores: 1,
+    ventasMes: 18,
+    metaMensual: 40,
+    leadsActivos: 67,
+    citasGeneradas: 45,
+    evaluacionesEquifax: 62,
+    ticketPromedio: 24500
+  },
+  {
+    id: 's3',
+    nombre: 'Miraflores',
+    zona: 'Lima Centro',
+    asesores: 4,
+    supervisores: 1,
+    ventasMes: 15,
+    metaMensual: 32,
+    leadsActivos: 52,
+    citasGeneradas: 38,
+    evaluacionesEquifax: 51,
+    ticketPromedio: 25800
+  }
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// NOTIFICACIONES SUPERVISOR (NUEVO 06-AGO-2026)
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const NOTIFICACIONES_SUPERVISOR = [
+  {
+    id: 'n1',
+    tipo: 'nuevo_lead',
+    titulo: 'Nuevo lead asignado',
+    mensaje: 'Lead "Carlos Mendoza" asignado a Juan Pérez',
+    timestamp: new Date('2026-08-06T13:45:00'),
+    leido: false,
+    vendedorId: 'v1',
+    leadId: 'l1'
+  },
+  {
+    id: 'n2',
+    tipo: 'lead_cerrado',
+    titulo: '¡Venta cerrada!',
+    mensaje: 'María Díaz cerró venta con "Ana Torres" - Toyota RAV4',
+    timestamp: new Date('2026-08-06T12:30:00'),
+    leido: false,
+    vendedorId: 'v2',
+    leadId: 'l2'
+  },
+  {
+    id: 'n3',
+    tipo: 'sin_gestion',
+    titulo: 'Lead sin gestión',
+    mensaje: 'Lead "Roberto Silva" sin actividad por 3 días (Luis Vega)',
+    timestamp: new Date('2026-08-06T10:15:00'),
+    leido: true,
+    vendedorId: 'v3',
+    leadId: 'l3',
+    prioridad: 'alta'
+  },
+  {
+    id: 'n4',
+    tipo: 'meta_cumplida',
+    titulo: 'Meta diaria alcanzada',
+    mensaje: 'Juan Pérez alcanzó su meta diaria de citas (5/5)',
+    timestamp: new Date('2026-08-06T09:00:00'),
+    leido: true,
+    vendedorId: 'v1'
+  }
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════

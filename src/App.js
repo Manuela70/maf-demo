@@ -35,7 +35,7 @@ import { AgenteCopiloto } from './agents/AgenteCopiloto.js';
 import { AgenteAsistente } from './agents/AgenteAsistente.js';
 import { AgentePriorizacion } from './agents/AgentePriorizacion.js';
 import { AgenteCopilotoEjecutivo } from './agents/AgenteCopilotoEjecutivo.js';
-import { generarReporteConsolidado, VENDEDORES } from './mockData.js';
+import { generarReporteConsolidado, VENDEDORES, LEADS, SUPERVISORES, SUCURSALES, FUENTES, NOTIFICACIONES_SUPERVISOR } from './mockData.js';
 
 // ─── REACT HOOKS ───────────────────────────────────────────────────────────
 const {
@@ -133,7 +133,7 @@ function HomeIndex() {
     className: "text-sm text-gray-500 mt-1"
   }, "Plataforma Web de Ventas \u2014 MAF Per\xFA EAFC"), /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/login'),
-    className: "mt-3 bg-gray-800 text-white px-6 py-2 rounded text-sm font-medium hover:bg-gray-700"
+    className: "mt-3 btn-maf primario"
   }, "\u25B6 Iniciar flujo desde Login")), /*#__PURE__*/React.createElement("div", {
     className: "bg-white border-2 border-dashed border-gray-300 rounded p-4 mb-4"
   }, /*#__PURE__*/React.createElement("p", {
@@ -180,7 +180,7 @@ function HomeIndex() {
     className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
   }, modules.map(mod => /*#__PURE__*/React.createElement("div", {
     key: mod,
-    className: "bg-white border border-gray-200 rounded shadow-sm p-4"
+    className: "card-maf p-4"
   }, /*#__PURE__*/React.createElement("h2", {
     className: "text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 pb-2 border-b border-gray-100"
   }, mod), /*#__PURE__*/React.createElement("div", {
@@ -435,7 +435,7 @@ function P01Login() {
     ),
     
     /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-6"
+    className: "card-maf"
   }, /*#__PURE__*/React.createElement("div", {
     className: "mb-4"
   }, /*#__PURE__*/React.createElement("label", {
@@ -532,7 +532,7 @@ function P02Recover() {
     },
     className: `text-xs px-3 py-1 rounded border ${estado === e ? 'bg-gray-200 border-gray-400 font-semibold' : 'border-gray-200 text-gray-500'}`
   }, e === 'solicitud' ? 'Estado 1: Solicitud' : e === 'nueva' ? 'Estado 2: Nueva contraseña' : 'Estado 3: Link expirado'))), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-8"
+    className: "card-maf p-8"
   }, /*#__PURE__*/React.createElement("h1", {
     className: "text-lg font-bold text-gray-900 mb-4 text-center"
   }, estado === 'solicitud' ? 'Recuperar contraseña' : estado === 'nueva' ? 'Nueva contraseña' : 'Enlace expirado'), estado === 'solicitud' && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(FormField, {
@@ -546,7 +546,7 @@ function P02Recover() {
     className: "mb-3 p-3 bg-gray-50 border border-gray-200 rounded text-sm text-gray-700"
   }, "Si el correo existe en nuestro sistema, recibir\xE1s instrucciones en breve."), /*#__PURE__*/React.createElement("button", {
     onClick: () => setSent(true),
-    className: "w-full bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700"
+    className: "w-full btn-maf primario"
   }, "Enviar enlace de recuperaci\xF3n")), estado === 'nueva' && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(FormField, {
     label: "Nueva contrase\xF1a",
     type: "password",
@@ -581,10 +581,10 @@ function P02Recover() {
     className: "mb-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700"
   }, "\u2717 El enlace de recuperaci\xF3n ha expirado o ya fue utilizado."), /*#__PURE__*/React.createElement("button", {
     onClick: () => setEstado('solicitud'),
-    className: "w-full bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700"
+    className: "w-full btn-maf primario"
   }, "Solicitar nuevo enlace")), /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/login'),
-    className: "w-full mt-3 border border-gray-300 text-gray-600 py-2 rounded text-sm hover:bg-gray-50"
+    className: "w-full mt-3 btn-maf secundario gris"
   }, "\u2190 Volver al login")), /*#__PURE__*/React.createElement("div", {
     className: "mt-4 space-y-1"
   }, /*#__PURE__*/React.createElement(AnnotationNote, {
@@ -656,6 +656,452 @@ function PCitas() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+// DASHBOARD SUPERVISOR CON FILTROS (NUEVO 06-AGO-2026)
+// ═══════════════════════════════════════════════════════════════════════════
+function DashboardSupervisor({ navigate }) {
+  const [filtroVendedor, setFiltroVendedor] = React.useState('');
+  const [filtroDealer, setFiltroDealer] = React.useState('');
+  const [mostrarNotificaciones, setMostrarNotificaciones] = React.useState(true);
+  
+  // Filtrar vendedores según selección de vendedor
+  const vendedoresFiltrados = filtroVendedor 
+    ? VENDEDORES.filter(v => v.id === filtroVendedor)
+    : VENDEDORES;
+  
+  // Contador de derivaciones por dealer (información adicional)
+  const derivacionesDealer = filtroDealer
+    ? LEADS.filter(l => l.dealer && l.dealer.includes(filtroDealer)).length
+    : 0;
+  
+  // Notificaciones no leídas
+  const notificacionesNoLeidas = NOTIFICACIONES_SUPERVISOR.filter(n => !n.leido);
+  
+  // Construir título dinámico
+  let titulo = "Métricas del Equipo - Surco";
+  if (filtroVendedor && filtroDealer) {
+    const vendedor = VENDEDORES.find(v => v.id === filtroVendedor);
+    titulo = `${vendedor?.nombreCompleto || 'Vendedor'} - Dealer: ${filtroDealer}`;
+  } else if (filtroVendedor) {
+    const vendedor = VENDEDORES.find(v => v.id === filtroVendedor);
+    titulo = `Métricas de ${vendedor?.nombreCompleto || 'Vendedor'}`;
+  } else if (filtroDealer) {
+    titulo = `Métricas del Equipo - Dealer: ${filtroDealer}`;
+  }
+  
+  // Iconos por tipo de notificación
+  const iconoNotificacion = {
+    'nuevo_lead': '📩',
+    'lead_cerrado': '🎉',
+    'sin_gestion': '⚠️',
+    'meta_cumplida': '🎯'
+  };
+  
+  return React.createElement("div", { className: "space-y-6" },
+    // Panel de notificaciones
+    notificacionesNoLeidas.length > 0 && mostrarNotificaciones && React.createElement("div", {
+      className: "card-maf bg-blue-50 border-blue-200"
+    },
+      React.createElement("div", { className: "card-maf-header border-b border-blue-200" },
+        React.createElement("div", { className: "flex items-center justify-between" },
+          React.createElement("div", { className: "flex items-center gap-2" },
+            React.createElement("span", { className: "text-lg" }, "🔔"),
+            React.createElement("h3", { className: "font-bold text-base" }, "Notificaciones"),
+            React.createElement("span", { 
+              className: "bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full" 
+            }, notificacionesNoLeidas.length)
+          ),
+          React.createElement("button", {
+            onClick: () => setMostrarNotificaciones(false),
+            className: "text-gray-400 hover:text-gray-600 text-sm"
+          }, "✕")
+        )
+      ),
+      React.createElement("div", { className: "space-y-2 mt-3" },
+        notificacionesNoLeidas.map(notif =>
+          React.createElement("div", {
+            key: notif.id,
+            className: `p-3 rounded-lg border ${
+              notif.prioridad === 'alta' 
+                ? 'bg-red-50 border-red-200' 
+                : 'bg-white border-blue-200'
+            }`
+          },
+            React.createElement("div", { className: "flex items-start gap-3" },
+              React.createElement("span", { className: "text-2xl" }, iconoNotificacion[notif.tipo] || '📌'),
+              React.createElement("div", { className: "flex-1" },
+                React.createElement("p", { className: "font-semibold text-sm text-gray-900" }, notif.titulo),
+                React.createElement("p", { className: "text-sm text-gray-600 mt-1" }, notif.mensaje),
+                React.createElement("p", { className: "text-xs text-gray-400 mt-1" }, 
+                  new Date(notif.timestamp).toLocaleTimeString('es-PE', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                  })
+                )
+              ),
+              notif.leadId && React.createElement("button", {
+                onClick: () => navigate(`/lead/${notif.leadId}`),
+                className: "btn-maf secundario text-xs px-3 py-1"
+              }, "Ver")
+            )
+          )
+        )
+      )
+    ),
+    
+    // Dashboard de métricas
+    React.createElement("div", {
+      className: "card-maf"
+    },
+    // Header con botón de exportar
+    React.createElement("div", {
+      className: "card-maf-header"
+    },
+      React.createElement("div", {
+        className: "flex items-center justify-between"
+      },
+        React.createElement("div", {
+          className: "flex items-center gap-3"
+        },
+          React.createElement("span", {
+            className: "text-2xl"
+          }, "📊"),
+          React.createElement("h3", {
+            className: "font-bold text-base"
+          }, titulo)
+        ),
+        React.createElement("button", {
+          onClick: () => {
+            const reporte = generarReporteConsolidado('s1');
+            console.log('Reporte generado:', reporte);
+            alert(`📄 Reporte consolidado generado\n\nSucursal: ${reporte.sucursal}\nFecha: ${reporte.fechaCorte}\n\n✓ ${reporte.reportePorVendedor.length} vendedores\n✓ ${reporte.alertas.length} alertas\n\n(En producción se descargaría como Excel/CSV)`);
+          },
+          className: "btn-maf secundario text-sm"
+        }, "📥 Exportar Reporte Diario")
+      )
+    ),
+    
+    // Filtros funcionales
+    React.createElement("div", {
+      className: "flex gap-3 mt-4 mb-4 items-center"
+    },
+      React.createElement("span", {
+        className: "text-sm font-semibold text-gray-700"
+      }, "Filtrar por:"),
+      React.createElement("select", {
+        className: "text-sm border border-gray-300 rounded px-3 py-2 bg-white",
+        value: filtroVendedor,
+        onChange: (e) => setFiltroVendedor(e.target.value)
+      },
+        React.createElement("option", { value: "" }, "👥 Todos los vendedores"),
+        VENDEDORES.map(v => React.createElement("option", { key: v.id, value: v.id }, v.nombreCompleto))
+      ),
+      React.createElement("select", {
+        className: "text-sm border border-gray-300 rounded px-3 py-2 bg-white",
+        value: filtroDealer,
+        onChange: (e) => setFiltroDealer(e.target.value)
+      },
+        React.createElement("option", { value: "" }, "🏢 Dealer: Todos"),
+        React.createElement("option", { value: "Autospar" }, "Autospar San Juan de Lurigancho"),
+        React.createElement("option", { value: "Pacifico" }, "Automotriz del Pacífico"),
+        React.createElement("option", { value: "ToyotaSur" }, "ToyotaSur - Surco"),
+        React.createElement("option", { value: "Motored" }, "Motored - San Miguel"),
+        React.createElement("option", { value: "Breña" }, "Breña Motors")
+      ),
+      (filtroVendedor || filtroDealer) && React.createElement("button", {
+        onClick: () => {
+          setFiltroVendedor('');
+          setFiltroDealer('');
+        },
+        className: "text-xs text-gray-500 hover:text-gray-700 underline"
+      }, "Limpiar filtros")
+    ),
+    
+    // Grid de métricas principales (usa vendedoresFiltrados)
+    React.createElement("div", {
+      className: "grid grid-cols-5 gap-4 mt-4"
+    },
+      // Ventas
+      React.createElement("div", {
+        className: "bg-blue-50 border border-blue-200 rounded-lg p-4"
+      },
+        React.createElement("div", {
+          className: "flex items-center justify-between mb-2"
+        },
+          React.createElement("span", {
+            className: "text-sm font-semibold text-blue-700"
+          }, "🎯 Ventas"),
+          React.createElement("span", {
+            className: "text-xs font-bold text-blue-600"
+          }, `${((vendedoresFiltrados.reduce((sum, v) => sum + v.ventasMes, 0) / vendedoresFiltrados.reduce((sum, v) => sum + v.metaMensual, 0)) * 100).toFixed(0)}%`)
+        ),
+        React.createElement("p", {
+          className: "text-3xl font-bold text-blue-900"
+        }, vendedoresFiltrados.reduce((sum, v) => sum + v.ventasMes, 0)),
+        React.createElement("p", {
+          className: "text-xs text-blue-600 mt-1"
+        }, `Meta: ${vendedoresFiltrados.reduce((sum, v) => sum + v.metaMensual, 0)}`)
+      ),
+      
+      // Citas
+      React.createElement("div", {
+        className: "bg-green-50 border border-green-200 rounded-lg p-4"
+      },
+        React.createElement("div", {
+          className: "flex items-center justify-between mb-2"
+        },
+          React.createElement("span", {
+            className: "text-sm font-semibold text-green-700"
+          }, "📅 Citas"),
+          React.createElement("span", {
+            className: "text-xs font-bold text-green-600"
+          }, `${((vendedoresFiltrados.reduce((sum, v) => sum + v.citasGeneradas, 0) / vendedoresFiltrados.reduce((sum, v) => sum + v.citasMeta, 0)) * 100).toFixed(0)}%`)
+        ),
+        React.createElement("p", {
+          className: "text-3xl font-bold text-green-900"
+        }, vendedoresFiltrados.reduce((sum, v) => sum + v.citasGeneradas, 0)),
+        React.createElement("p", {
+          className: "text-xs text-green-600 mt-1"
+        }, `Meta: ${vendedoresFiltrados.reduce((sum, v) => sum + v.citasMeta, 0)}`)
+      ),
+      
+      // Evaluaciones Equifax
+      React.createElement("div", {
+        className: "bg-purple-50 border border-purple-200 rounded-lg p-4"
+      },
+        React.createElement("div", {
+          className: "flex items-center justify-between mb-2"
+        },
+          React.createElement("span", {
+            className: "text-sm font-semibold text-purple-700"
+          }, "🔍 Evaluaciones Equifax"),
+          React.createElement("span", {
+            className: "text-xs font-bold text-purple-600"
+          }, `${((vendedoresFiltrados.reduce((sum, v) => sum + v.evaluacionesEquifax, 0) / vendedoresFiltrados.reduce((sum, v) => sum + v.evaluacionesMeta, 0)) * 100).toFixed(0)}%`)
+        ),
+        React.createElement("p", {
+          className: "text-3xl font-bold text-purple-900"
+        }, vendedoresFiltrados.reduce((sum, v) => sum + v.evaluacionesEquifax, 0)),
+        React.createElement("p", {
+          className: "text-xs text-purple-600 mt-1"
+        }, `Meta: ${vendedoresFiltrados.reduce((sum, v) => sum + v.evaluacionesMeta, 0)}`)
+      ),
+      
+      // Ticket Promedio
+      React.createElement("div", {
+        className: "bg-amber-50 border border-amber-200 rounded-lg p-4"
+      },
+        React.createElement("div", {
+          className: "flex items-center justify-between mb-2"
+        },
+          React.createElement("span", {
+            className: "text-sm font-semibold text-amber-700"
+          }, "💰 Ticket Promedio"),
+          React.createElement("span", {
+            className: "text-xs font-bold text-amber-600"
+          }, "USD")
+        ),
+        React.createElement("p", {
+          className: "text-2xl font-bold text-amber-900"
+        }, `$${(vendedoresFiltrados.reduce((sum, v) => sum + v.ticketPromedio, 0) / vendedoresFiltrados.length).toLocaleString()}`),
+        React.createElement("p", {
+          className: "text-xs text-amber-600 mt-1"
+        }, `Meta: $${vendedoresFiltrados[0]?.ticketMeta?.toLocaleString() || '23,500'}`)
+      ),
+      
+      // Derivaciones Dealers (nueva métrica)
+      React.createElement("div", {
+        className: "bg-cyan-50 border border-cyan-200 rounded-lg p-4"
+      },
+        React.createElement("div", {
+          className: "flex items-center justify-between mb-2"
+        },
+          React.createElement("span", {
+            className: "text-sm font-semibold text-cyan-700"
+          }, "🚗 Derivaciones"),
+          React.createElement("span", {
+            className: "text-xs font-bold text-cyan-600"
+          }, filtroDealer ? "Dealer" : "Todas")
+        ),
+        React.createElement("p", {
+          className: "text-3xl font-bold text-cyan-900"
+        }, filtroDealer ? derivacionesDealer : LEADS.filter(l => l.dealer).length),
+        React.createElement("p", {
+          className: "text-xs text-cyan-600 mt-1"
+        }, filtroDealer ? "de este dealer" : "total dealers")
+      )
+    )
+    ) // Cierre del card-maf de métricas
+  ); // Cierre del div space-y-6
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DASHBOARD GERENTE COMERCIAL (NUEVO 06-AGO-2026)
+// ═══════════════════════════════════════════════════════════════════════════
+
+function DashboardGerente({ navigate }) {
+  // Métricas globales
+  const totalLeads = LEADS.length;
+  const totalVentas = SUCURSALES.reduce((sum, s) => sum + s.ventasMes, 0);
+  const totalMeta = SUCURSALES.reduce((sum, s) => sum + s.metaMensual, 0);
+  const totalAsesores = SUCURSALES.reduce((sum, s) => sum + s.asesores, 0);
+  const totalSucursales = SUCURSALES.length;
+  
+  // Funnel de conversión (basado en leads)
+  const leadsNuevos = LEADS.filter(l => l.estado === 'Nuevo').length;
+  const leadsContactados = LEADS.filter(l => l.estado === 'Contactado' || l.estado === 'En seguimiento').length;
+  const leadsEvaluacion = LEADS.filter(l => l.evaluacionEquifax).length;
+  const leadsCerrados = LEADS.filter(l => l.estado === 'Cerrado').length;
+  
+  // Por fuente
+  const leadsPorFuente = {
+    'Landing': LEADS.filter(l => l.fuente === FUENTES.LANDING).length,
+    'Call Center': LEADS.filter(l => l.fuente === FUENTES.CALLCENTER).length,
+    'Toyota': LEADS.filter(l => l.fuente === FUENTES.TOYOTA).length,
+    'Derivación Dealer': LEADS.filter(l => l.dealer).length,
+    'Cartera Propia': LEADS.filter(l => l.fuente === FUENTES.CARTERA_PROPIA).length
+  };
+  
+  return React.createElement("div", { className: "space-y-6" },
+    // Header
+    React.createElement("div", { className: "flex items-center justify-between" },
+      React.createElement("div", null,
+        React.createElement("h1", { className: "text-lg font-bold text-gray-900" }, "Panel Gerente Comercial"),
+        React.createElement("p", { className: "text-xs text-gray-400" }, "Vista consolidada - Todas las sucursales")
+      ),
+      React.createElement("button", {
+        onClick: () => alert('Exportando reporte ejecutivo...'),
+        className: "btn-maf secundario text-sm"
+      }, "📥 Exportar Reporte")
+    ),
+    
+    // Métricas principales (4 cards)
+    React.createElement("div", { className: "grid grid-cols-4 gap-4" },
+      React.createElement("div", { className: "bg-blue-50 border border-blue-200 rounded-lg p-4" },
+        React.createElement("p", { className: "text-sm font-semibold text-blue-700" }, "📊 Total Leads"),
+        React.createElement("p", { className: "text-3xl font-bold text-blue-900 mt-2" }, totalLeads),
+        React.createElement("p", { className: "text-xs text-blue-600 mt-1" }, "este mes")
+      ),
+      React.createElement("div", { className: "bg-green-50 border border-green-200 rounded-lg p-4" },
+        React.createElement("p", { className: "text-sm font-semibold text-green-700" }, "🎯 Ventas"),
+        React.createElement("p", { className: "text-3xl font-bold text-green-900 mt-2" }, totalVentas),
+        React.createElement("p", { className: "text-xs text-green-600 mt-1" }, `Meta: ${totalMeta} (${((totalVentas/totalMeta)*100).toFixed(0)}%)`)
+      ),
+      React.createElement("div", { className: "bg-purple-50 border border-purple-200 rounded-lg p-4" },
+        React.createElement("p", { className: "text-sm font-semibold text-purple-700" }, "🏢 Sucursales"),
+        React.createElement("p", { className: "text-3xl font-bold text-purple-900 mt-2" }, totalSucursales),
+        React.createElement("p", { className: "text-xs text-purple-600 mt-1" }, `${totalAsesores} asesores`)
+      ),
+      React.createElement("div", { className: "bg-amber-50 border border-amber-200 rounded-lg p-4" },
+        React.createElement("p", { className: "text-sm font-semibold text-amber-700" }, "📈 Conversión"),
+        React.createElement("p", { className: "text-3xl font-bold text-amber-900 mt-2" }, `${((leadsCerrados/totalLeads)*100).toFixed(1)}%`),
+        React.createElement("p", { className: "text-xs text-amber-600 mt-1" }, `${leadsCerrados} cerrados`)
+      )
+    ),
+    
+    // Funnel de conversión
+    React.createElement("div", { className: "card-maf" },
+      React.createElement("h3", { className: "font-bold text-base mb-4" }, "🔄 Funnel de Conversión"),
+      React.createElement("div", { className: "space-y-3" },
+        [
+          { label: 'Nuevo', count: leadsNuevos, color: 'bg-gray-200', total: totalLeads },
+          { label: 'Contactado', count: leadsContactados, color: 'bg-blue-300', total: totalLeads },
+          { label: 'Evaluación', count: leadsEvaluacion, color: 'bg-purple-300', total: totalLeads },
+          { label: 'Cerrado', count: leadsCerrados, color: 'bg-green-400', total: totalLeads }
+        ].map(stage => 
+          React.createElement("div", { key: stage.label, className: "flex items-center gap-3" },
+            React.createElement("div", { className: "w-24 text-sm font-semibold text-gray-700" }, stage.label),
+            React.createElement("div", { className: "flex-1 bg-gray-100 rounded-full h-8 relative overflow-hidden" },
+              React.createElement("div", { 
+                className: `${stage.color} h-full flex items-center justify-end pr-3`,
+                style: { width: `${(stage.count/stage.total)*100}%` }
+              },
+                React.createElement("span", { className: "text-sm font-bold text-gray-800" }, stage.count)
+              )
+            ),
+            React.createElement("div", { className: "w-16 text-sm text-gray-600 text-right" }, 
+              `${((stage.count/stage.total)*100).toFixed(0)}%`
+            )
+          )
+        )
+      )
+    ),
+    
+    // Grid de 2 columnas: Sucursales y Supervisores
+    React.createElement("div", { className: "grid grid-cols-2 gap-4" },
+      // Sucursales
+      React.createElement("div", { className: "card-maf" },
+        React.createElement("h3", { className: "font-bold text-base mb-4" }, "🏢 Rendimiento por Sucursal"),
+        React.createElement("div", { className: "space-y-2" },
+          SUCURSALES.map(s =>
+            React.createElement("div", { key: s.id, className: "flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200" },
+              React.createElement("div", null,
+                React.createElement("p", { className: "font-semibold text-gray-800" }, s.nombre),
+                React.createElement("p", { className: "text-xs text-gray-500" }, `${s.asesores} asesores • ${s.leadsActivos} leads activos`)
+              ),
+              React.createElement("div", { className: "text-right" },
+                React.createElement("p", { className: "text-lg font-bold text-gray-900" }, `${s.ventasMes}/${s.metaMensual}`),
+                React.createElement("p", { className: "text-xs text-gray-600" }, `${((s.ventasMes/s.metaMensual)*100).toFixed(0)}%`)
+              )
+            )
+          )
+        )
+      ),
+      
+      // Supervisores
+      React.createElement("div", { className: "card-maf" },
+        React.createElement("h3", { className: "font-bold text-base mb-4" }, "👥 Supervisores"),
+        React.createElement("div", { className: "space-y-2" },
+          SUPERVISORES.map(sup =>
+            React.createElement("div", { key: sup.id, className: "flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200" },
+              React.createElement("div", null,
+                React.createElement("p", { className: "font-semibold text-gray-800" }, sup.nombre),
+                React.createElement("p", { className: "text-xs text-gray-500" }, `${sup.sucursal} • ${sup.asesoresACargo} asesores`)
+              ),
+              React.createElement("div", { className: "text-right" },
+                React.createElement("p", { className: "text-lg font-bold text-gray-900" }, `${sup.ventasMes}/${sup.metaMensual}`),
+                React.createElement("p", { className: "text-xs text-gray-600" }, `${sup.citasGeneradas} citas`)
+              )
+            )
+          )
+        )
+      )
+    ),
+    
+    // Leads por Fuente y Dealers
+    React.createElement("div", { className: "grid grid-cols-2 gap-4" },
+      // Por fuente
+      React.createElement("div", { className: "card-maf" },
+        React.createElement("h3", { className: "font-bold text-base mb-4" }, "📍 Leads por Fuente"),
+        React.createElement("div", { className: "space-y-2" },
+          Object.entries(leadsPorFuente).map(([fuente, count]) =>
+            React.createElement("div", { key: fuente, className: "flex items-center justify-between p-2 border-b border-gray-100" },
+              React.createElement("span", { className: "text-sm text-gray-700" }, fuente),
+              React.createElement("span", { className: "text-sm font-bold text-gray-900" }, count)
+            )
+          )
+        )
+      ),
+      
+      // Top Asesores
+      React.createElement("div", { className: "card-maf" },
+        React.createElement("h3", { className: "font-bold text-base mb-4" }, "⭐ Top Asesores"),
+        React.createElement("div", { className: "space-y-2" },
+          VENDEDORES.sort((a, b) => b.ventasMes - a.ventasMes).slice(0, 5).map((v, idx) =>
+            React.createElement("div", { key: v.id, className: "flex items-center justify-between p-2 border-b border-gray-100" },
+              React.createElement("div", { className: "flex items-center gap-2" },
+                React.createElement("span", { className: "text-lg font-bold text-gray-400" }, `${idx + 1}.`),
+                React.createElement("span", { className: "text-sm text-gray-700" }, v.nombreCompleto)
+              ),
+              React.createElement("span", { className: "text-sm font-bold text-gray-900" }, `${v.ventasMes} ventas`)
+            )
+          )
+        )
+      )
+    )
+  );
+}
+
 // P05 — DASHBOARD PRINCIPAL
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -677,7 +1123,7 @@ function P05Dashboard() {
   };
   const filtrados = DEMO_LEADS.filter(l => (!filtroEstado || l.estado === filtroEstado) && (!busqueda || l.nombre.toLowerCase().includes(busqueda.toLowerCase())));
 
-  // Gerente: solo vista de reportería
+  // Gerente: dashboard ejecutivo completo
   if (rol === 'gerente') return /*#__PURE__*/React.createElement(Screen, {
     path: "/dashboard"
   }, /*#__PURE__*/React.createElement(React.Fragment, null,
@@ -689,31 +1135,9 @@ function P05Dashboard() {
       className: "mb-6"
     }),
     
-    /*#__PURE__*/React.createElement("div", {
-    className: "flex items-center justify-between mb-4"
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
-    className: "text-lg font-bold text-gray-900"
-  }, "Panel Gerente Comercial"), /*#__PURE__*/React.createElement("p", {
-    className: "text-xs text-gray-400"
-  }, "Solo lectura \u2014 Reporter\xEDa y m\xE9tricas de zona"))), /*#__PURE__*/React.createElement("div", {
-    className: "grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6"
-  }, [['Leads este mes', '342'], ['Contratos cerrados', '18'], ['Tasa conversión', '5.3%'], ['Asesores activos', '12']].map(([k, v]) => /*#__PURE__*/React.createElement("div", {
-    key: k,
-    className: "bg-white border border-gray-200 rounded shadow-sm p-4 text-center"
-  }, /*#__PURE__*/React.createElement("p", {
-    className: "text-2xl font-bold text-gray-900"
-  }, v), /*#__PURE__*/React.createElement("p", {
-    className: "text-xs text-gray-500 mt-1"
-  }, k)))), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-6 text-center text-gray-400"
-  }, /*#__PURE__*/React.createElement("p", {
-    className: "text-sm"
-  }, "Dashboard BI embebido (QuickSight / Power BI)"), /*#__PURE__*/React.createElement("p", {
-    className: "text-xs mt-1"
-  }, "Fase 2 \u2014 requiere acumulaci\xF3n de datos operativos (3\u20136 meses)"), /*#__PURE__*/React.createElement(AnnotationNote, {
-    type: "rule",
-    text: "RF-020 DECIDIDO: Fase 1 incluye 3 dashboards nativos (Asesor, Supervisor, Gerente) con m\xE9tricas calculadas sobre la BD de la plataforma, opcionalmente con QuickSight embebido. Dashboard BI avanzado sobre Snowflake/Redshift \u2192 Fase 2."
-  }))));
+    // Dashboard completo del gerente
+    /*#__PURE__*/React.createElement(DashboardGerente, { navigate })
+  ));
 
   // Call Center: solo creación de leads
   if (rol === 'callcenter') return /*#__PURE__*/React.createElement(Screen, {
@@ -726,9 +1150,9 @@ function P05Dashboard() {
     className: "text-xs text-gray-400"
   }, "Solo puede registrar y asignar leads")), /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/lead/new'),
-    className: "bg-gray-800 text-white text-sm px-4 py-2 rounded hover:bg-gray-700"
+    className: "btn-maf primario text-sm"
   }, "+ Registrar lead")), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-4 mb-4"
+    className: "card-maf mb-4"
   }, /*#__PURE__*/React.createElement("p", {
     className: "text-xs font-semibold text-gray-500 uppercase mb-3"
   }, "Leads registrados hoy"), /*#__PURE__*/React.createElement("div", {
@@ -760,7 +1184,7 @@ function P05Dashboard() {
     className: "text-xs bg-red-100 text-red-700 border border-red-200 rounded px-2 py-1 font-semibold"
   }, "3 casos pendientes")), /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/plaft/panel'),
-    className: "w-full bg-gray-800 text-white py-2.5 rounded text-sm font-semibold hover:bg-gray-700 mb-4"
+    className: "w-full btn-maf primario mb-4"
   }, "Ir al panel de cumplimiento \u2192"), /*#__PURE__*/React.createElement(AnnotationNote, {
     type: "rule",
     text: "Oficial opera solo en horario L\u2013V 9:00\u201318:00. SLA orientativo: 20\u201360 min por caso."
@@ -779,7 +1203,7 @@ function P05Dashboard() {
     className: "text-xs bg-gray-200 text-gray-700 rounded px-2 py-1 font-semibold"
   }, "4 expedientes")), /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/close/ops'),
-    className: "w-full bg-gray-800 text-white py-2.5 rounded text-sm font-semibold hover:bg-gray-700 mb-4"
+    className: "w-full btn-maf primario mb-4"
   }, "Ver expedientes pendientes \u2192"), /*#__PURE__*/React.createElement(AnnotationNote, {
     type: "rule",
     text: "Operaciones valida: DNI vigente, estado civil, poderes de representaci\xF3n (PJ). Confirma en NewCon."
@@ -798,7 +1222,7 @@ function P05Dashboard() {
     className: "text-xs bg-gray-200 text-gray-700 rounded px-2 py-1 font-semibold"
   }, "2 casos PJ")), /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/eval/empresa'),
-    className: "w-full bg-gray-800 text-white py-2.5 rounded text-sm font-semibold hover:bg-gray-700 mb-4"
+    className: "w-full btn-maf primario mb-4"
   }, "Ver evaluaciones pendientes \u2192"), /*#__PURE__*/React.createElement(AnnotationNote, {
     type: "rule",
     text: "Analista Cr\xE9ditos: solo eval\xFAa Persona Jur\xEDdica (RUC). NO usa Equifax \u2014 evaluaci\xF3n manual."
@@ -886,131 +1310,7 @@ function P05Dashboard() {
     ),
     
     // NUEVO (05-AGO-2026): Dashboard consolidado del supervisor
-    rol === 'supervisor' && !vacío && /*#__PURE__*/React.createElement("div", {
-      className: "card-maf mb-6"
-    },
-      // Header con botón de exportar
-      React.createElement("div", {
-        className: "card-maf-header"
-      },
-        React.createElement("div", {
-          className: "flex items-center justify-between"
-        },
-          React.createElement("div", {
-            className: "flex items-center gap-3"
-          },
-            React.createElement("span", {
-              className: "text-2xl"
-            }, "📊"),
-            React.createElement("h3", {
-              className: "font-bold text-base"
-            }, "Métricas del Equipo - Surco")
-          ),
-          React.createElement("button", {
-            onClick: () => {
-              const reporte = generarReporteConsolidado('s1');
-              console.log('Reporte generado:', reporte);
-              // Simular descarga
-              alert(`📄 Reporte consolidado generado\n\nSucursal: ${reporte.sucursal}\nFecha: ${reporte.fechaCorte}\n\n✓ ${reporte.reportePorVendedor.length} vendedores\n✓ ${reporte.alertas.length} alertas\n\n(En producción se descargaría como Excel/CSV)`);
-            },
-            className: "btn-maf secundario text-sm"
-          }, "📥 Exportar Reporte Diario")
-        )
-      ),
-      
-      // Grid de métricas principales
-      React.createElement("div", {
-        className: "grid grid-cols-4 gap-4 mt-4"
-      },
-        // Ventas
-        React.createElement("div", {
-          className: "bg-blue-50 border border-blue-200 rounded-lg p-4"
-        },
-          React.createElement("div", {
-            className: "flex items-center justify-between mb-2"
-          },
-            React.createElement("span", {
-              className: "text-sm font-semibold text-blue-700"
-            }, "🎯 Ventas"),
-            React.createElement("span", {
-              className: "text-xs font-bold text-blue-600"
-            }, `${((VENDEDORES.reduce((sum, v) => sum + v.ventasMes, 0) / VENDEDORES.reduce((sum, v) => sum + v.metaMensual, 0)) * 100).toFixed(0)}%`)
-          ),
-          React.createElement("p", {
-            className: "text-3xl font-bold text-blue-900"
-          }, VENDEDORES.reduce((sum, v) => sum + v.ventasMes, 0)),
-          React.createElement("p", {
-            className: "text-xs text-blue-600 mt-1"
-          }, `Meta: ${VENDEDORES.reduce((sum, v) => sum + v.metaMensual, 0)}`)
-        ),
-        
-        // Citas
-        React.createElement("div", {
-          className: "bg-green-50 border border-green-200 rounded-lg p-4"
-        },
-          React.createElement("div", {
-            className: "flex items-center justify-between mb-2"
-          },
-            React.createElement("span", {
-              className: "text-sm font-semibold text-green-700"
-            }, "📅 Citas"),
-            React.createElement("span", {
-              className: "text-xs font-bold text-green-600"
-            }, `${((VENDEDORES.reduce((sum, v) => sum + v.citasGeneradas, 0) / VENDEDORES.reduce((sum, v) => sum + v.citasMeta, 0)) * 100).toFixed(0)}%`)
-          ),
-          React.createElement("p", {
-            className: "text-3xl font-bold text-green-900"
-          }, VENDEDORES.reduce((sum, v) => sum + v.citasGeneradas, 0)),
-          React.createElement("p", {
-            className: "text-xs text-green-600 mt-1"
-          }, `Meta: ${VENDEDORES.reduce((sum, v) => sum + v.citasMeta, 0)}`)
-        ),
-        
-        // Evaluaciones
-        React.createElement("div", {
-          className: "bg-purple-50 border border-purple-200 rounded-lg p-4"
-        },
-          React.createElement("div", {
-            className: "flex items-center justify-between mb-2"
-          },
-            React.createElement("span", {
-              className: "text-sm font-semibold text-purple-700"
-            }, "🔍 Evaluaciones"),
-            React.createElement("span", {
-              className: "text-xs font-bold text-purple-600"
-            }, `${((VENDEDORES.reduce((sum, v) => sum + v.evaluacionesEquifax, 0) / VENDEDORES.reduce((sum, v) => sum + v.evaluacionesMeta, 0)) * 100).toFixed(0)}%`)
-          ),
-          React.createElement("p", {
-            className: "text-3xl font-bold text-purple-900"
-          }, VENDEDORES.reduce((sum, v) => sum + v.evaluacionesEquifax, 0)),
-          React.createElement("p", {
-            className: "text-xs text-purple-600 mt-1"
-          }, `Meta: ${VENDEDORES.reduce((sum, v) => sum + v.evaluacionesMeta, 0)}`)
-        ),
-        
-        // Certificados + Ticket
-        React.createElement("div", {
-          className: "bg-amber-50 border border-amber-200 rounded-lg p-4"
-        },
-          React.createElement("div", {
-            className: "flex items-center justify-between mb-2"
-          },
-            React.createElement("span", {
-              className: "text-sm font-semibold text-amber-700"
-            }, "📜 Certificados"),
-            React.createElement("span", {
-              className: "text-xs font-bold text-amber-600"
-            }, `$${(VENDEDORES.reduce((sum, v) => sum + v.ticketPromedio, 0) / VENDEDORES.length).toFixed(0)}`)
-          ),
-          React.createElement("p", {
-            className: "text-3xl font-bold text-amber-900"
-          }, VENDEDORES.reduce((sum, v) => sum + v.certificadosEmitidos, 0)),
-          React.createElement("p", {
-            className: "text-xs text-amber-600 mt-1"
-          }, "Ticket prom. equipo")
-        )
-      )
-    ),
+    rol === 'supervisor' && !vacío && React.createElement(DashboardSupervisor, { navigate }),
     
     /*#__PURE__*/React.createElement("div", {
     className: "flex items-center justify-between mb-4"
@@ -1020,7 +1320,7 @@ function P05Dashboard() {
     className: "text-xs text-gray-400"
   }, "Visibilidad: todos los leads de la sucursal")), ['asesor', 'jefe_ventas', 'admin'].includes(rol) && /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/lead/new'),
-    className: "hidden sm:block bg-gray-800 text-white text-sm px-4 py-2 rounded hover:bg-gray-700"
+    className: "hidden sm:block btn-maf primario text-sm"
   }, "+ Nuevo Lead")), /*#__PURE__*/React.createElement("div", {
     className: "flex gap-3 mb-4 flex-wrap"
   }, /*#__PURE__*/React.createElement(DemoToggle, {
@@ -1028,7 +1328,7 @@ function P05Dashboard() {
     value: vacío,
     onChange: setVacío
   })), vacío ? /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-12 text-center"
+    className: "card-maf p-12 text-center"
   }, /*#__PURE__*/React.createElement("div", {
     className: "text-4xl mb-3"
   }, "\uD83D\uDCCB"), /*#__PURE__*/React.createElement("h2", {
@@ -1037,9 +1337,9 @@ function P05Dashboard() {
     className: "text-sm text-gray-400 mb-4"
   }, "Comienza creando tu primer lead prospecto."), ['asesor', 'jefe_ventas', 'admin'].includes(rol) && /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/lead/new'),
-    className: "bg-gray-800 text-white px-6 py-2 rounded text-sm hover:bg-gray-700"
+    className: "btn-maf primario"
   }, "Crear primer lead")) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-4 mb-4"
+    className: "card-maf mb-4"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex flex-wrap gap-3"
   }, /*#__PURE__*/React.createElement("select", {
@@ -1058,7 +1358,7 @@ function P05Dashboard() {
   }), esSupervisor && /*#__PURE__*/React.createElement("select", {
     className: "text-sm border border-gray-300 rounded px-3 py-1.5 bg-white"
   }, /*#__PURE__*/React.createElement("option", null, "Todos los asesores"), /*#__PURE__*/React.createElement("option", null, "M. L\xF3pez"), /*#__PURE__*/React.createElement("option", null, "J. Garc\xEDa"), /*#__PURE__*/React.createElement("option", null, "C. Reyes")))), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm overflow-hidden"
+    className: "card-maf overflow-hidden"
   }, /*#__PURE__*/React.createElement("div", {
     className: "overflow-x-auto"
   }, /*#__PURE__*/React.createElement("table", {
@@ -1089,7 +1389,7 @@ function P05Dashboard() {
     className: "px-4 py-3"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/lead/1'),
-    className: "text-xs text-gray-600 border border-gray-300 rounded px-3 py-1 hover:bg-gray-50"
+    className: "text-xs btn-maf secundario gris"
   }, "Ver \u2192"))))))), /*#__PURE__*/React.createElement("div", {
     className: "px-4 py-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500"
   }, /*#__PURE__*/React.createElement("span", null, "Mostrando ", filtrados.length, " leads"), /*#__PURE__*/React.createElement("div", {
@@ -1099,7 +1399,7 @@ function P05Dashboard() {
     className: `px-2 py-1 rounded border ${p === '1' ? 'bg-gray-200 border-gray-400 font-semibold' : 'border-gray-200 hover:bg-gray-50'}`
   }, p)))))), /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/lead/new'),
-    className: "fixed bottom-6 right-6 sm:hidden bg-gray-800 text-white w-12 h-12 rounded-full shadow-lg text-xl flex items-center justify-center"
+    className: "fixed bottom-6 right-6 sm:hidden btn-maf primario w-12 h-12 rounded-full shadow-lg text-xl flex items-center justify-center"
   }, "+"), /*#__PURE__*/React.createElement("div", {
     className: "mt-4 space-y-1"
   }, /*#__PURE__*/React.createElement(AnnotationNote, {
@@ -1220,7 +1520,7 @@ function PGLGestionLeads() {
     className: "text-xs text-gray-400 mt-0.5"
   }, "5 asesores \xB7 Autospar San Juan de Lurigancho")), /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/lead/new'),
-    className: "bg-gray-800 text-white text-sm px-4 py-2 rounded hover:bg-gray-700"
+    className: "btn-maf primario text-sm"
   }, "+ Nuevo lead")), 
   
   // 🎯 AGENTE 3: PRIORIZACIÓN DE CARTERA
@@ -1571,7 +1871,7 @@ function PGLCallCenter() {
     rows: "3"
   }), /*#__PURE__*/React.createElement("button", {
     onClick: agregarNota,
-    className: "w-full bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700"
+    className: "w-full btn-maf primario"
   }, "Guardar nota"))))), /*#__PURE__*/React.createElement("div", {
     className: "space-y-1"
   }, /*#__PURE__*/React.createElement(AnnotationNote, {
@@ -1632,7 +1932,7 @@ function P07CreateLead() {
   }, /*#__PURE__*/React.createElement("h1", {
     className: "text-lg font-bold text-gray-900 mb-5"
   }, "Crear Lead"), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-6 space-y-4"
+    className: "card-maf space-y-4"
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
     className: "text-xs font-semibold text-gray-500 uppercase mb-2"
   }, "Concesionario y sucursal"), /*#__PURE__*/React.createElement("div", {
@@ -1761,10 +2061,10 @@ function P07CreateLead() {
     className: "flex gap-3 pt-2"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/lead/list'),
-    className: "flex-1 border border-gray-300 rounded py-2 text-sm text-gray-600 hover:bg-gray-50"
+    className: "flex-1 btn-maf secundario gris"
   }, "Cancelar"), /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/lead/1'),
-    className: "flex-1 bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700"
+    className: "flex-1 btn-maf primario"
   }, "Guardar lead")))));
 }
 
@@ -1817,7 +2117,7 @@ function P08LeadDetail() {
   }, /*#__PURE__*/React.createElement("div", {
     className: "lg:col-span-2"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-4 mb-4"
+    className: "card-maf mb-4"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex items-start justify-between flex-wrap gap-2"
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
@@ -1834,9 +2134,9 @@ function P08LeadDetail() {
     className: "text-xs text-gray-500"
   }, "DNI 45678901"))), /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/eval/identity'),
-    className: "bg-gray-800 text-white text-sm px-4 py-2 rounded hover:bg-gray-700"
+    className: "btn-maf primario text-sm"
   }, "Iniciar evaluaci\xF3n \u2192"))), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm overflow-hidden mb-4"
+    className: "card-maf overflow-hidden mb-4"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex border-b border-gray-200"
   }, ['datos', 'evaluaciones', 'documentos', 'historial'].map(t => /*#__PURE__*/React.createElement("button", {
@@ -1928,7 +2228,7 @@ function P08LeadDetail() {
   }, h.evento)))))))), /*#__PURE__*/React.createElement("div", {
     className: "space-y-4"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-4"
+    className: "card-maf p-4"
   }, /*#__PURE__*/React.createElement("h3", {
     className: "text-sm font-semibold text-gray-700 mb-3"
   }, "\uD83D\uDFE1 Estado del lead (con estados macro)"), /*#__PURE__*/React.createElement("label", {
@@ -2002,7 +2302,7 @@ function P08LeadDetail() {
   }, /*#__PURE__*/React.createElement("option", {
     value: ""
   }, "\u2014 Seleccionar raz\xF3n \u2014"), /*#__PURE__*/React.createElement("option", null, "N\xFAmero err\xF3neo"), /*#__PURE__*/React.createElement("option", null, "No interesado"), /*#__PURE__*/React.createElement("option", null, "Solicit\xF3 no ser contactado"), /*#__PURE__*/React.createElement("option", null, "Fuera de perfil"))), /*#__PURE__*/React.createElement("button", {
-    className: "w-full bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700 mb-3"
+    className: "w-full btn-maf primario mb-3"
   }, "Guardar estado"), /*#__PURE__*/React.createElement("div", {
     className: "p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800 mb-3"
   }, /*#__PURE__*/React.createElement("strong", null, "\uD83D\uDFE1 L\xF3gica 18/06:"), " Al seleccionar \"Contactado\" o \"No contactado\" aparece un segundo dropdown con los sub-estados espec\xEDficos. El estado \"Nuevo\" no despliega sub-estados."), /*#__PURE__*/React.createElement("div", {
@@ -2014,16 +2314,16 @@ function P08LeadDetail() {
   }, "Cerrado \u2014 asignaci\xF3n autom\xE1tica"), /*#__PURE__*/React.createElement("p", {
     className: "text-xs text-gray-400"
   }, "El sistema lo asigna al recibir N\xB0 de contrato desde NewCon."))))), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-4"
+    className: "card-maf p-4"
   }, /*#__PURE__*/React.createElement("h3", {
     className: "text-sm font-semibold text-gray-700 mb-3"
   }, "Siguiente paso"), /*#__PURE__*/React.createElement("p", {
     className: "text-xs text-gray-500 mb-3"
   }, "El lead est\xE1 listo para evaluaci\xF3n crediticia."), /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/eval/identity'),
-    className: "w-full bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700"
+    className: "w-full btn-maf primario"
   }, "Iniciar evaluaci\xF3n crediticia \u2192")), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-4"
+    className: "card-maf p-4"
   }, /*#__PURE__*/React.createElement("h3", {
     className: "text-sm font-semibold text-gray-700 mb-2"
   }, "Notas del asesor"), /*#__PURE__*/React.createElement("textarea", {
@@ -2035,7 +2335,7 @@ function P08LeadDetail() {
   }), /*#__PURE__*/React.createElement("p", {
     className: "text-xs text-gray-400 mt-1"
   }, "\u2713 Guardado autom\xE1ticamente")), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-4"
+    className: "card-maf p-4"
   }, /*#__PURE__*/React.createElement("h3", {
     className: "text-sm font-semibold text-gray-700 mb-3"
   }, "Contacto"), /*#__PURE__*/React.createElement("p", {
@@ -2086,7 +2386,7 @@ function P09Identity() {
   }, /*#__PURE__*/React.createElement("h1", {
     className: "text-lg font-bold text-gray-900 mb-4"
   }, "P09 \u2014 Verificaci\xF3n de Identidad"), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-6"
+    className: "card-maf"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex gap-1 mb-4 bg-gray-100 p-1 rounded"
   }, ['DNI', 'CE', 'Pasaporte', 'RUC'].map(t => /*#__PURE__*/React.createElement("button", {
@@ -2311,7 +2611,7 @@ function P09Identity() {
     disabled: estado !== 'success' && !apiError,
     className: `flex-1 py-2 rounded text-sm font-semibold ${estado !== 'success' && !apiError ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gray-800 text-white hover:bg-gray-700'}`
   }, "Confirmar y continuar \u2192"), apiError && /*#__PURE__*/React.createElement("button", {
-    className: "flex-1 border border-gray-300 rounded py-2 text-sm text-gray-600 hover:bg-gray-50"
+    className: "flex-1 btn-maf secundario gris"
   }, "Ingresar manualmente"))), /*#__PURE__*/React.createElement("div", {
     className: "mt-4 space-y-1"
   }, /*#__PURE__*/React.createElement(AnnotationNote, {
@@ -2533,7 +2833,7 @@ function P09bCertificates() {
     value: !apiOk,
     onChange: v => setApiOk(!v)
   })))), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-4 mb-4"
+    className: "card-maf mb-4"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex items-center justify-between"
   }, /*#__PURE__*/React.createElement("p", {
@@ -2610,7 +2910,7 @@ function P10Equifax() {
     onClick: () => setEstado(e.k),
     className: `text-xs px-3 py-1 rounded border ${estado === e.k ? 'bg-gray-200 border-gray-400 font-semibold' : 'border-gray-200 text-gray-500 hover:bg-gray-50'}`
   }, "[ Demo: ", e.l, " ]"))), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-6"
+    className: "card-maf"
   }, /*#__PURE__*/React.createElement("div", {
     className: "mb-4 p-3 bg-gray-50 border border-gray-200 rounded text-sm"
   }, /*#__PURE__*/React.createElement("p", {
@@ -2654,7 +2954,7 @@ function P10Equifax() {
       }));
       navigate('/plaft/result');
     },
-    className: "w-full bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700"
+    className: "w-full btn-maf primario"
   }, "Continuar a evaluaci\xF3n PLAFT \u2192")), estado === 'denegado1' && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     className: "p-4 bg-gray-100 border border-gray-300 rounded mb-4 text-center"
   }, /*#__PURE__*/React.createElement("div", {
@@ -2692,7 +2992,7 @@ function P10Equifax() {
     className: "p-3 bg-gray-50 border border-gray-200 rounded text-sm text-gray-600 mb-4"
   }, "El proceso de evaluaci\xF3n crediticia ha concluido. El lead ser\xE1 marcado como Rechazado."), /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/lead/1'),
-    className: "w-full border border-gray-300 rounded py-2 text-sm text-gray-600 hover:bg-gray-50"
+    className: "w-full btn-maf secundario gris"
   }, "\u2190 Volver a ficha del lead"))), /*#__PURE__*/React.createElement("div", {
     className: "mt-4 space-y-1"
   }, /*#__PURE__*/React.createElement(AnnotationNote, {
@@ -2769,7 +3069,7 @@ function P10Unified() {
       className: "font-bold text-gray-900"
     }, "Evaluaci\xF3n aprobada \u2014 Ambos titulares califican")), /*#__PURE__*/React.createElement("button", {
       onClick: () => navigate('/sale/groups'),
-      className: "w-full bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700"
+      className: "w-full btn-maf primario"
     }, "Continuar a selecci\xF3n de grupo \u2192"));
     if (casuistica === 'c2') return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
       className: "flex gap-3 mb-3"
@@ -2786,7 +3086,7 @@ function P10Unified() {
     }, "Coasociado"), /*#__PURE__*/React.createElement("p", {
       className: "text-sm font-bold text-white mt-1"
     }, "\u2717 Rechazado"))), /*#__PURE__*/React.createElement("div", {
-      className: "p-4 bg-gray-800 text-white rounded mb-3 text-center"
+      className: "w-full btn-maf primario mb-3 text-center"
     }, /*#__PURE__*/React.createElement("div", {
       className: "text-2xl mb-1"
     }, "\u2717"), /*#__PURE__*/React.createElement("p", {
@@ -2801,7 +3101,7 @@ function P10Unified() {
       className: "text-xs"
     }, "Puedes reintentar la evaluaci\xF3n con: (1) monto reducido, (2) plazo diferente, o (3) cambiar el coasociado. No hay l\xEDmite de reintentos.")), /*#__PURE__*/React.createElement("button", {
       onClick: () => navigate('/eval/riesgo'),
-      className: "w-full bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700 mb-2"
+      className: "w-full btn-maf primario mb-2"
     }, "Re-evaluar con datos modificados \u2192"), /*#__PURE__*/React.createElement("div", {
       className: "space-y-1"
     }, /*#__PURE__*/React.createElement(AnnotationNote, {
@@ -2826,7 +3126,7 @@ function P10Unified() {
     }, "Coasociado"), /*#__PURE__*/React.createElement("p", {
       className: "text-sm font-bold text-gray-800 mt-1"
     }, "\u2713 Aprobado"))), /*#__PURE__*/React.createElement("div", {
-      className: "p-4 bg-gray-800 text-white rounded mb-3 text-center"
+      className: "w-full btn-maf primario mb-3 text-center"
     }, /*#__PURE__*/React.createElement("div", {
       className: "text-2xl mb-1"
     }, "\u2717"), /*#__PURE__*/React.createElement("p", {
@@ -2841,7 +3141,7 @@ function P10Unified() {
       className: "text-xs"
     }, "Intenta con: (1) monto reducido, (2) plazo diferente. Sin l\xEDmite de reintentos.")), /*#__PURE__*/React.createElement("button", {
       onClick: () => navigate('/eval/riesgo'),
-      className: "w-full bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700 mb-2"
+      className: "w-full btn-maf primario mb-2"
     }, "Re-evaluar con datos modificados \u2192"), /*#__PURE__*/React.createElement("div", {
       className: "p-3 bg-orange-50 border border-orange-200 rounded text-xs text-orange-800 mb-2"
     }, "\u26A0 L\xF3gica restrictiva: si el titular principal falla, la operaci\xF3n cae sin importar el resultado del coasociado."), /*#__PURE__*/React.createElement(AnnotationNote, {
@@ -2863,7 +3163,7 @@ function P10Unified() {
     }, "Coasociado"), /*#__PURE__*/React.createElement("p", {
       className: "text-sm font-bold text-white mt-1"
     }, "\u2717 Rechazado"))), /*#__PURE__*/React.createElement("div", {
-      className: "p-4 bg-gray-800 text-white rounded mb-3 text-center"
+      className: "w-full btn-maf primario mb-3 text-center"
     }, /*#__PURE__*/React.createElement("div", {
       className: "text-2xl mb-1"
     }, "\u2717"), /*#__PURE__*/React.createElement("p", {
@@ -2878,7 +3178,7 @@ function P10Unified() {
       className: "text-xs"
     }, "Intenta con: (1) monto significativamente reducido, (2) plazo diferente, o (3) cambiar ambos titulares. Sin l\xEDmite de reintentos.")), /*#__PURE__*/React.createElement("button", {
       onClick: () => navigate('/eval/riesgo'),
-      className: "w-full bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700 mb-2"
+      className: "w-full btn-maf primario mb-2"
     }, "Re-evaluar con datos modificados \u2192"));
     if (casuistica === 'c5') return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
       className: "flex gap-3 mb-3"
@@ -2904,7 +3204,7 @@ function P10Unified() {
       className: "text-sm text-gray-600 mt-1"
     }, "El coasociado requiere revisi\xF3n manual por el Oficial de Cumplimiento.")), /*#__PURE__*/React.createElement("button", {
       onClick: () => navigate('/sale/groups'),
-      className: "w-full bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700 mb-2"
+      className: "w-full btn-maf primario mb-2"
     }, "Ver proforma mientras esperas \u2192"), /*#__PURE__*/React.createElement("div", {
       className: "p-2 bg-red-50 border border-red-200 rounded text-xs text-red-700 text-center mb-2"
     }, "\u26A0 La orden de pago estar\xE1 bloqueada hasta que el Oficial resuelva"), /*#__PURE__*/React.createElement(AnnotationNote, {
@@ -3021,7 +3321,7 @@ function P10Unified() {
     className: "font-bold text-gray-900 text-lg"
   }, "Evaluaci\xF3n aprobada \u2014 puede continuar")), /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/sale/groups'),
-    className: "w-full bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700"
+    className: "w-full btn-maf primario"
   }, "Continuar a selecci\xF3n de grupo \u2192")), !coTitActivo && estado === 'rechazado' && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     className: "p-4 bg-gray-800 text-white rounded mb-4 text-center"
   }, /*#__PURE__*/React.createElement("div", {
@@ -3032,7 +3332,7 @@ function P10Unified() {
     className: "text-sm text-gray-300 mt-1"
   }, "No es posible continuar con este prospecto.")), /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/lead/1'),
-    className: "w-full border border-gray-300 rounded py-2 text-sm text-gray-600 hover:bg-gray-50"
+    className: "w-full btn-maf secundario gris"
   }, "\u2190 Volver a ficha del lead")), !coTitActivo && estado === 'primer_rechazo' && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     className: "p-4 bg-yellow-50 border border-yellow-300 rounded mb-4 text-center"
   }, /*#__PURE__*/React.createElement("div", {
@@ -3049,7 +3349,7 @@ function P10Unified() {
     key: m,
     className: "flex-1 text-xs border border-gray-300 rounded px-2 py-2 hover:bg-gray-50"
   }, m))), /*#__PURE__*/React.createElement("button", {
-    className: "w-full bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700"
+    className: "w-full btn-maf primario"
   }, "Re-evaluar con nuevo monto"), /*#__PURE__*/React.createElement("p", {
     className: "text-xs text-gray-400 text-center mt-2"
   }, "Solo 1 reintento permitido por sesi\xF3n")), !coTitActivo && estado === 'en_revision' && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
@@ -3074,7 +3374,7 @@ function P10Unified() {
     className: "mt-3 flex flex-col gap-2"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/sale/groups'),
-    className: "w-full bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700"
+    className: "w-full btn-maf primario"
   }, "Ver proforma mientras esperas \u2192"), /*#__PURE__*/React.createElement("div", {
     className: "p-2 bg-red-50 border border-red-200 rounded text-xs text-red-700 text-center"
   }, "\u26A0 La orden de pago (P23) est\xE1 bloqueada hasta que el Oficial resuelva"))), !coTitActivo && estado === 'error' && /*#__PURE__*/React.createElement("div", {
@@ -3100,7 +3400,7 @@ function P10Unified() {
     key: c.id,
     value: c.id
   }, c.label)))), /*#__PURE__*/React.createElement(CasuisticaResult, null))), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-4 mb-4"
+    className: "card-maf mb-4"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex items-center justify-between"
   }, /*#__PURE__*/React.createElement("p", {
@@ -3200,7 +3500,7 @@ function P12Supervisor() {
   }, /*#__PURE__*/React.createElement("div", {
     className: "lg:col-span-1"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm overflow-hidden"
+    className: "card-maf overflow-hidden"
   }, /*#__PURE__*/React.createElement("div", {
     className: "px-4 py-3 bg-gray-50 border-b border-gray-200"
   }, /*#__PURE__*/React.createElement("p", {
@@ -3253,7 +3553,7 @@ function P12Supervisor() {
     className: `flex-1 py-2 rounded text-sm font-semibold border ${comentario.length < 20 ? 'border-gray-200 text-gray-300 cursor-not-allowed' : 'border-gray-400 text-gray-700 hover:bg-gray-50'}`
   }, "\u2717 Rechazar"), /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/plaft/result'),
-    className: "flex-1 bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700"
+    className: "flex-1 btn-maf primario"
   }, "\u2713 Aprobar \u2192 PLAFT"))))), /*#__PURE__*/React.createElement("div", {
     className: "mt-4 space-y-1"
   }, /*#__PURE__*/React.createElement(AnnotationNote, {
@@ -3305,7 +3605,7 @@ function P13Empresa() {
     onClick: () => setEstado(e.k),
     className: `text-xs px-3 py-1 rounded border ${estado === e.k ? 'bg-gray-200 border-gray-400 font-semibold' : 'border-gray-200 text-gray-500'}`
   }, "[ Demo: ", e.l, " ]"))), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-6"
+    className: "card-maf"
   }, estado === 'formulario' && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("p", {
     className: "text-xs font-semibold text-gray-500 uppercase mb-3"
   }, "Datos financieros de la empresa"), /*#__PURE__*/React.createElement(FormField, {
@@ -3413,7 +3713,7 @@ function P15PLAFT() {
     onClick: () => setEstado(e.k),
     className: `text-xs px-3 py-1 rounded border ${estado === e.k ? 'bg-gray-200 border-gray-400 font-semibold' : 'border-gray-200 text-gray-500'}`
   }, "[ Demo: ", e.l, " ]"))), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-6"
+    className: "card-maf"
   }, /*#__PURE__*/React.createElement("div", {
     className: "mb-4 p-3 bg-gray-50 border border-gray-200 rounded text-sm"
   }, /*#__PURE__*/React.createElement("p", {
@@ -3548,7 +3848,7 @@ function P16PanelOficial() {
   }, "P16 \u2014 Panel Oficial de Cumplimiento PLAFT"), /*#__PURE__*/React.createElement("span", {
     className: "bg-gray-200 text-gray-800 text-xs font-bold px-3 py-1 rounded"
   }, casos.length, " casos pendientes")), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm overflow-hidden"
+    className: "card-maf overflow-hidden"
   }, /*#__PURE__*/React.createElement("div", {
     className: "overflow-x-auto"
   }, /*#__PURE__*/React.createElement("table", {
@@ -3614,7 +3914,7 @@ function P17ResolvePLAFT() {
   }, /*#__PURE__*/React.createElement("h1", {
     className: "text-lg font-bold text-gray-900 mb-4"
   }, "P17 \u2014 Resoluci\xF3n Caso PLAFT"), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-6"
+    className: "card-maf"
   }, /*#__PURE__*/React.createElement("div", {
     className: "border border-gray-200 rounded p-4 mb-4 bg-gray-50"
   }, /*#__PURE__*/React.createElement("p", {
@@ -3762,7 +4062,7 @@ function PMsgPopups() {
     className: "space-y-3"
   }, mensajesCliente.map(m => /*#__PURE__*/React.createElement("div", {
     key: m.id,
-    className: "bg-white border border-gray-200 rounded shadow-sm p-4"
+    className: "card-maf p-4"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex items-start justify-between mb-2"
   }, /*#__PURE__*/React.createElement("span", {
@@ -3779,7 +4079,7 @@ function PMsgPopups() {
     className: "space-y-3"
   }, mensajesCompliance.map(m => /*#__PURE__*/React.createElement("div", {
     key: m.id,
-    className: "bg-white border border-gray-200 rounded shadow-sm p-4"
+    className: "card-maf p-4"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex items-start justify-between mb-2"
   }, /*#__PURE__*/React.createElement("span", {
@@ -4032,7 +4332,7 @@ function P19Proforma() {
     onClick: () => setEstado(e.k),
     className: `text-xs px-3 py-1 rounded border ${estado === e.k ? 'bg-gray-200 border-gray-400 font-semibold' : 'border-gray-200 text-gray-500'}`
   }, "[ Demo: ", e.l, " ]"))), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-4 mb-4"
+    className: "card-maf mb-4"
   }, /*#__PURE__*/React.createElement("p", {
     className: "text-xs font-semibold text-gray-500 uppercase mb-2"
   }, "Resumen"), /*#__PURE__*/React.createElement("div", {
@@ -4052,7 +4352,7 @@ function P19Proforma() {
   }, "Generando proforma..."), /*#__PURE__*/React.createElement("p", {
     className: "text-xs text-gray-400 mt-1"
   }, "Calculando cuotas y cronograma de pagos")), estado === 'lista' && /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-4"
+    className: "card-maf p-4"
   }, /*#__PURE__*/React.createElement("div", {
     className: "bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-gray-500 text-sm mb-4",
     style: {
@@ -4095,12 +4395,12 @@ function P19Proforma() {
     className: "flex flex-col gap-2"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/sale/otp'),
-    className: "w-full bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700"
+    className: "w-full btn-maf primario"
   }, "\u2713 Confirmar y continuar \u2192"), /*#__PURE__*/React.createElement("button", {
-    className: "w-full border border-gray-300 rounded py-2 text-sm text-gray-600 hover:bg-gray-50"
+    className: "w-full btn-maf secundario gris"
   }, "\u2B07 Descargar proforma"), /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/sale/groups'),
-    className: "w-full border border-gray-300 rounded py-2 text-sm text-gray-600 hover:bg-gray-50"
+    className: "w-full btn-maf secundario gris"
   }, "\u2190 Cambiar grupo"))), estado === 'error' && /*#__PURE__*/React.createElement("div", {
     className: "bg-white border border-gray-200 rounded shadow-sm p-6 text-center"
   }, /*#__PURE__*/React.createElement("div", {
@@ -4185,7 +4485,7 @@ function P20OTP() {
     onClick: () => navigate('/sale/docs'),
     className: "bg-gray-800 text-white px-6 py-2 rounded text-sm font-semibold"
   }, "Continuar \u2192")) : /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-6"
+    className: "card-maf"
   }, /*#__PURE__*/React.createElement("div", {
     className: "mb-4 p-3 bg-gray-50 border border-gray-200 rounded text-sm"
   }, /*#__PURE__*/React.createElement("p", {
@@ -4278,7 +4578,7 @@ function P21Docs() {
     onClick: () => navigate('/sale/scan'),
     className: "bg-gray-800 text-white px-6 py-2 rounded text-sm font-semibold"
   }, "Continuar \u2192")) : /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-6"
+    className: "card-maf"
   }, /*#__PURE__*/React.createElement("p", {
     className: "text-xs font-semibold text-gray-500 uppercase mb-3"
   }, "Documentos a enviar"), /*#__PURE__*/React.createElement("div", {
@@ -4298,7 +4598,7 @@ function P21Docs() {
     className: "mb-4"
   }), /*#__PURE__*/React.createElement("button", {
     onClick: enviarDocs,
-    className: "w-full bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700"
+    className: "w-full btn-maf primario"
   }, "Enviar todos los documentos")), /*#__PURE__*/React.createElement("div", {
     className: "mt-4 space-y-1"
   }, /*#__PURE__*/React.createElement(AnnotationNote, {
@@ -4370,7 +4670,7 @@ function P22ScanDNI() {
   }, "P22 \u2014 Captura de DNI \u26A1"), /*#__PURE__*/React.createElement("div", {
     className: "mb-4 p-3 bg-blue-50 border-l-4 border-blue-400 text-xs text-blue-800"
   }, "Esta captura es ", /*#__PURE__*/React.createElement("strong", null, "OPCIONAL"), " en este paso (solo se necesita el n\xFAmero de doc para Kashio). Es ", /*#__PURE__*/React.createElement("strong", null, "OBLIGATORIA"), " antes de disparar la firma Keynua."), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-6"
+    className: "card-maf"
   }, /*#__PURE__*/React.createElement("p", {
     className: "text-sm text-gray-600 mb-4"
   }, "Adjunta una foto clara del DNI del cliente. El archivo se almacenar\xE1 con retenci\xF3n legal de 5 a\xF1os."), /*#__PURE__*/React.createElement("div", {
@@ -4474,7 +4774,7 @@ function P23Payment() {
     onClick: () => setEstado(e.k),
     className: `text-xs px-3 py-1 rounded border ${estado === e.k ? 'bg-gray-200 border-gray-400 font-semibold' : 'border-gray-200 text-gray-500 hover:bg-gray-50'}`
   }, "[ Demo: ", e.l, " ]"))), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-6"
+    className: "card-maf"
   }, estado === 'inicial' && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "mb-4 p-3 bg-gray-50 border border-gray-200 rounded text-sm space-y-1"
   }, /*#__PURE__*/React.createElement("p", {
@@ -4524,7 +4824,7 @@ function P23Payment() {
     className: "p-2 bg-blue-50 border border-blue-200 rounded mt-2 text-xs text-blue-800"
   }, "\uD83D\uDFE1 18/06: Cuota 1 se debe pagar \xEDntegra obligatoriamente. La CIA puede pagarse desde 1 USD sin m\xEDnimo."))), /*#__PURE__*/React.createElement("button", {
     onClick: () => setEstado(montoCompleto ? 'generada' : 'pago_cuenta'),
-    className: "w-full bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700"
+    className: "w-full btn-maf primario"
   }, "Generar orden en Kashio \u2192")), estado === 'generada' && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "p-3 bg-gray-50 border border-gray-300 rounded mb-4"
   }, /*#__PURE__*/React.createElement("p", {
@@ -4559,7 +4859,7 @@ function P23Payment() {
   }, "\u23F3"), " Esperando confirmaci\xF3n de pago"), /*#__PURE__*/React.createElement("div", {
     className: "flex flex-col gap-2"
   }, /*#__PURE__*/React.createElement("button", {
-    className: "w-full border border-gray-300 rounded py-2 text-sm text-gray-600 hover:bg-gray-50"
+    className: "w-full btn-maf secundario gris"
   }, "Reenviar orden al cliente (correo/WhatsApp/SMS)"), /*#__PURE__*/React.createElement("button", {
     onClick: () => {
       setDemoState(s => ({
@@ -4568,7 +4868,7 @@ function P23Payment() {
       }));
       navigate('/close/keynua');
     },
-    className: "w-full bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700"
+    className: "w-full btn-maf primario"
   }, "[ Demo ] Simular pago confirmado \u2014 Continuar a firma \u2192"), /*#__PURE__*/React.createElement("div", {
     className: "mt-2 p-2 bg-gray-50 border border-gray-200 rounded text-xs text-gray-500"
   }, "\uD83D\uDFE1 ", /*#__PURE__*/React.createElement("strong", null, "Notificaci\xF3n autom\xE1tica al confirmar pago:"), " El sistema notificar\xE1 autom\xE1ticamente a Asesor, Supervisor y Cliente cuando reciba el webhook de confirmaci\xF3n de pago desde Kashio."))), estado === 'pago_cuenta' && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
@@ -4866,7 +5166,7 @@ function P27Contract() {
   }, /*#__PURE__*/React.createElement("h1", {
     className: "text-lg font-bold text-gray-900 mb-4"
   }, "P27 \u2014 N\xB0 Contrato + Separaci\xF3n de Vacante"), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-6"
+    className: "card-maf"
   }, /*#__PURE__*/React.createElement("div", {
     className: "p-3 bg-gray-50 border border-gray-200 rounded mb-4 text-center"
   }, /*#__PURE__*/React.createElement("span", {
@@ -4927,7 +5227,7 @@ function P27Contract() {
     className: "text-sm text-gray-700 py-0.5"
   }, d))), /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/close/send'),
-    className: "w-full bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700"
+    className: "w-full btn-maf primario"
   }, "Enviar expediente a Operaciones \u2192")), /*#__PURE__*/React.createElement("div", {
     className: "mt-4 space-y-1"
   }, /*#__PURE__*/React.createElement(AnnotationNote, {
@@ -5022,7 +5322,7 @@ function P28SendExpedient() {
     className: "flex justify-between"
   }, /*#__PURE__*/React.createElement("span", null, "Fecha firma:"), /*#__PURE__*/React.createElement("span", null, "16/04/2026 14:33")))), /*#__PURE__*/React.createElement("button", {
     onClick: () => setPrevisualizando(false),
-    className: "w-full bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700"
+    className: "w-full btn-maf primario"
   }, "Confirmar y volver al env\xEDo \u2192")));
   return /*#__PURE__*/React.createElement(Screen, {
     path: "/close/send",
@@ -5053,7 +5353,7 @@ function P28SendExpedient() {
     onClick: () => navigate('/close/ops'),
     className: "text-xs border border-gray-300 rounded px-3 py-1 hover:bg-gray-50"
   }, "Ver panel Operaciones \u2192")) : /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-6"
+    className: "card-maf"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex items-center justify-between mb-3"
   }, /*#__PURE__*/React.createElement("p", {
@@ -5159,7 +5459,7 @@ function P29Ops() {
   }, /*#__PURE__*/React.createElement("span", {
     className: "bg-gray-200 text-gray-800 text-xs font-bold px-3 py-1 rounded"
   }, expedientes.length, " expedientes pendientes")), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm overflow-hidden"
+    className: "card-maf overflow-hidden"
   }, /*#__PURE__*/React.createElement("div", {
     className: "overflow-x-auto"
   }, /*#__PURE__*/React.createElement("table", {
@@ -5241,7 +5541,7 @@ function P29Ops() {
     className: `flex-1 py-2 rounded text-sm font-semibold border ${!motivo ? 'border-gray-200 text-gray-300 cursor-not-allowed' : 'border-gray-400 text-gray-700 hover:bg-gray-50'}`
   }, "\u2717 Rechazar con motivo"), /*#__PURE__*/React.createElement("button", {
     onClick: () => navigate('/close/welcome'),
-    className: "flex-1 bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700"
+    className: "flex-1 btn-maf primario"
   }, "\u2713 Aprobar expediente")))), /*#__PURE__*/React.createElement("div", {
     className: "mt-4 space-y-1"
   }, /*#__PURE__*/React.createElement(AnnotationNote, {
@@ -5292,7 +5592,7 @@ function P31Welcome() {
     onClick: () => navigate('/dashboard'),
     className: "border border-gray-300 rounded px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
   }, "\u2190 Volver al dashboard"))) : /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-6"
+    className: "card-maf"
   }, /*#__PURE__*/React.createElement("div", {
     className: "mb-4 p-3 bg-gray-50 border border-gray-200 rounded text-sm"
   }, /*#__PURE__*/React.createElement("p", {
@@ -5455,7 +5755,7 @@ function CrudTable({
   onDelete
 }) {
   return /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm overflow-hidden"
+    className: "card-maf overflow-hidden"
   }, /*#__PURE__*/React.createElement("div", {
     className: "overflow-x-auto"
   }, /*#__PURE__*/React.createElement("table", {
@@ -5531,9 +5831,9 @@ function P32Users() {
     className: "text-xs text-gray-400 mt-0.5"
   }, "Cada usuario tiene un perfil (correo) y se le asignan N roles. Solo uno es el principal activo.")), /*#__PURE__*/React.createElement("button", {
     onClick: openCreate,
-    className: "bg-gray-800 text-white text-sm px-4 py-2 rounded hover:bg-gray-700"
+    className: "btn-maf primario text-sm"
   }, "+ Crear usuario")), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm overflow-hidden mb-4"
+    className: "card-maf overflow-hidden mb-4"
   }, /*#__PURE__*/React.createElement("div", {
     className: "overflow-x-auto"
   }, /*#__PURE__*/React.createElement("table", {
@@ -5739,7 +6039,7 @@ function AdminRoles() {
   }, "Gesti\xF3n de Roles"), /*#__PURE__*/React.createElement("p", {
     className: "text-xs text-gray-400 mt-0.5"
   }, "El c\xF3digo del rol es inmutable. Nunca se valida el ID autoincrementable.")), /*#__PURE__*/React.createElement("button", {
-    className: "bg-gray-800 text-white text-sm px-4 py-2 rounded hover:bg-gray-700"
+    className: "btn-maf primario text-sm"
   }, "+ Nuevo rol")), /*#__PURE__*/React.createElement(CrudTable, {
     cols: ['Código', 'Nombre', 'Nivel', 'Usuarios'],
     rows: rolesData
@@ -5783,7 +6083,7 @@ function AdminPermisos() {
     onClick: () => setRolSel(r),
     className: "text-xs px-3 py-1.5 rounded border " + (rolSel === r ? 'bg-gray-800 text-white border-gray-800' : 'border-gray-200 text-gray-600 hover:bg-gray-50')
   }, ROLE_LABELS[r]))), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-4"
+    className: "card-maf p-4"
   }, /*#__PURE__*/React.createElement("p", {
     className: "text-xs font-semibold text-gray-500 uppercase mb-3"
   }, "Permisos de ", ROLE_LABELS[rolSel]), /*#__PURE__*/React.createElement("div", {
@@ -5847,7 +6147,7 @@ function AdminSucursales() {
   }, "Sucursales / Locales"), /*#__PURE__*/React.createElement("p", {
     className: "text-xs text-gray-400 mt-0.5"
   }, "48 sucursales activas registradas. Los leads se asignan por dealer + sucursal.")), /*#__PURE__*/React.createElement("button", {
-    className: "bg-gray-800 text-white text-sm px-4 py-2 rounded hover:bg-gray-700"
+    className: "btn-maf primario text-sm"
   }, "+ Nueva sucursal")), /*#__PURE__*/React.createElement(CrudTable, {
     cols: ['Nombre', 'Código', 'Dealer', 'Zona', 'Distrito', 'Asesores', 'Activo'],
     rows: sucursales
@@ -5908,7 +6208,7 @@ function AdminDealers() {
   }, "Dealers / Concesionarios"), /*#__PURE__*/React.createElement("p", {
     className: "text-xs text-gray-400 mt-0.5"
   }, "11 dealers activos. Cada dealer tiene N sucursales y un responsable MAF asignado.")), /*#__PURE__*/React.createElement("button", {
-    className: "bg-gray-800 text-white text-sm px-4 py-2 rounded hover:bg-gray-700"
+    className: "btn-maf primario text-sm"
   }, "+ Nuevo dealer")), /*#__PURE__*/React.createElement(CrudTable, {
     cols: ['Nombre', 'RUC', 'Zona', 'Sucursales', 'Responsable', 'Activo'],
     rows: dealers
@@ -5972,7 +6272,7 @@ function AdminPlantillas() {
   }, "Plantillas de Documentos"), /*#__PURE__*/React.createElement("p", {
     className: "text-xs text-gray-400 mt-0.5"
   }, "6 documentos normativos + proforma + contrato. Las variables se resuelven con datos del prospecto al generar.")), /*#__PURE__*/React.createElement("button", {
-    className: "bg-gray-800 text-white text-sm px-4 py-2 rounded hover:bg-gray-700"
+    className: "btn-maf primario text-sm"
   }, "+ Nueva plantilla")), /*#__PURE__*/React.createElement("div", {
     className: "grid grid-cols-1 gap-3 mb-4"
   }, plantillas.map(p => /*#__PURE__*/React.createElement("div", {
@@ -6109,7 +6409,7 @@ function AdminNotificaciones() {
     className: "space-y-3"
   }, templates.map(t => /*#__PURE__*/React.createElement("div", {
     key: t.id,
-    className: "bg-white border border-gray-200 rounded shadow-sm p-4"
+    className: "card-maf p-4"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex items-start justify-between"
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
@@ -6315,7 +6615,7 @@ function AdminBI() {
   }, "Dashboard BI / Reporter\xEDa"), /*#__PURE__*/React.createElement("p", {
     className: "text-xs text-gray-400 mt-0.5"
   }, "Vista segmentada por rol. Cada actor ve solo los datos de su \xE1mbito."))), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-4 mb-4"
+    className: "card-maf mb-4"
   }, /*#__PURE__*/React.createElement("p", {
     className: "text-xs font-semibold text-gray-600 mb-2"
   }, "Opciones evaluadas (pendiente decisi\xF3n con Juan Carlos)"), /*#__PURE__*/React.createElement("div", {
@@ -6351,7 +6651,7 @@ function AdminBI() {
     onClick: () => setRolVista(r),
     className: "text-xs px-3 py-1.5 rounded border " + (rolVista === r ? 'bg-gray-800 text-white' : 'border-gray-200 text-gray-600 hover:bg-gray-50')
   }, ROLE_LABELS[r]))), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white border border-gray-200 rounded shadow-sm p-4 mb-4"
+    className: "card-maf mb-4"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex items-center justify-between mb-3"
   }, /*#__PURE__*/React.createElement("p", {
