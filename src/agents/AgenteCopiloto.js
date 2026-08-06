@@ -205,7 +205,7 @@ export function AgenteCopiloto({
       className: "fixed bottom-6 right-6 w-14 h-14 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-2xl flex items-center justify-center z-30 transition-all hover:scale-110",
       title: "Abrir Asistente MAF"
     },
-      React.createElement("span", { className: "text-2xl" }, "💬")
+      React.createElement("span", { className: "text-xs font-bold" }, "MAF")
     );
   }
 

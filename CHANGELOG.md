@@ -4,6 +4,108 @@ Registro centralizado de cambios, decisiones y evolución del proyecto.
 
 ---
 
+## [v2.3.1] - 2026-08-06
+
+### 🎬 Ajustes Finales para Grabación del Demo
+
+**Contexto:** Preparación de la grabación del demo para presentación a la CEO  
+**Fecha:** 06-AGO-2026  
+**Objetivo:** Mejoras visuales y funcionales para el impacto del storytelling
+
+---
+
+#### 📊 1. Filtro por Dealer y Botón de Exportar
+
+**Archivo modificado:** `src/App.js` (PGLGestionLeads), `src/mockData.js`
+
+**Funcionalidad agregada:**
+- Selector de dealer/concesionario en la vista de gestión de leads
+- Botón "📥 Exportar" para descargar leads filtrados
+- Lista de 5 dealers en mockData: Autospar SJL, Automotriz del Pacífico, ToyotaSur, Motored, Breña Motors
+- Campo `dealer` agregado a todos los leads
+
+**Impacto:**
+- Permite filtrar leads por origen dealer
+- Facilita análisis de derivaciones por concesionario
+- Exportación muestra resumen de filtros aplicados
+
+---
+
+#### 💬 2. Preguntas de Derivaciones en Copiloto Ejecutivo
+
+**Archivos modificados:** `src/mockData.js`, `src/agents/AgenteCopilotoEjecutivo.js`
+
+**Preguntas agregadas:**
+1. "¿Qué dealer no cumple las 5 derivaciones diarias?"
+2. "¿Cuántas derivaciones hay por dealer?"
+3. "¿Quién derivó este deal?"
+4. "¿Cómo va el ticket promedio vs meta?"
+
+**Data agregada:**
+- Campo `derivacionesDiarias` en todos los vendedores (v1-v6)
+- Meta de 5 derivaciones diarias
+- Lógica de análisis de cumplimiento
+
+---
+
+#### 📈 3. Análisis de Ticket Promedio
+
+**Archivo modificado:** `src/mockData.js`, `src/agents/AgenteCopilotoEjecutivo.js`
+
+**Funcionalidad:**
+- Pregunta "¿Cómo va el ticket promedio vs meta?"
+- Cálculo automático de ticket promedio del equipo
+- Identificación de asesores por debajo de meta
+- Análisis de brecha porcentual vs objetivo ($23,500 USD)
+
+---
+
+#### 🧹 4. Remoción de Labels Técnicos
+
+**Archivos modificados:** `src/App.js`
+
+**Cambios:**
+- Eliminadas 4 notas técnicas visibles (RF-GL-CC-01, Estados Macro, etc.)
+- AnnotationNote ya retorna null por diseño
+- Sistema luce limpio y profesional para la demo
+
+---
+
+#### 💬 5. Ícono de WhatsApp en Botón
+
+**Archivo modificado:** `src/agents/AgenteAsistente.js`
+
+**Cambio:**
+- Agregado emoji 💬 antes de "Enviar WhatsApp de seguimiento"
+- Mejora visual instantánea del CTA principal
+
+---
+
+#### 🎨 6. Branding MAF en Copilotos
+
+**Archivos modificados:** `src/agents/AgenteCopiloto.js`, `src/agents/AgenteCopilotoEjecutivo.js`
+
+**Cambios:**
+- Botón flotante: cambiado emoji por texto "MAF"
+- Título: "Asistente MAF" (unificado en ambos copilotos)
+- Tooltip: "Abrir Asistente MAF"
+- Refuerza identidad de marca en toda la experiencia
+
+---
+
+### 📝 Resumen Técnico
+
+**Archivos modificados:**
+- `src/App.js` (filtros, remoción de notas técnicas)
+- `src/mockData.js` (dealers, derivaciones, preguntas ejecutivas)
+- `src/agents/AgenteAsistente.js` (ícono WhatsApp)
+- `src/agents/AgenteCopiloto.js` (branding MAF)
+- `src/agents/AgenteCopilotoEjecutivo.js` (preguntas, branding MAF)
+
+**Total de cambios:** 6 funcionalidades, 5 archivos modificados
+
+---
+
 ## [v2.3.0] - 2026-08-05
 
 ### 🎯 Cambios Críticos para Demo del 09-AGO

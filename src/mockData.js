@@ -34,7 +34,10 @@ export const VENDEDORES = [
     evaluacionesMeta: 30,
     certificadosEmitidos: 14, // Igual a ventasMes
     ticketPromedio: 24100, // USD - por encima de meta ($23,500)
-    ticketMeta: 23500
+    ticketMeta: 23500,
+    // Derivaciones diarias (NUEVO 06-AGO-2026)
+    derivacionesDiarias: 6, // Cumple meta de 5
+    derivacionesMeta: 5
   },
   {
     id: 'v2',
@@ -57,7 +60,9 @@ export const VENDEDORES = [
     evaluacionesMeta: 30,
     certificadosEmitidos: 11,
     ticketPromedio: 22800, // Ligeramente por debajo de meta
-    ticketMeta: 23500
+    ticketMeta: 23500,
+    derivacionesDiarias: 4, // NO cumple meta
+    derivacionesMeta: 5
   },
   {
     id: 'v3',
@@ -80,7 +85,9 @@ export const VENDEDORES = [
     evaluacionesMeta: 30,
     certificadosEmitidos: 9,
     ticketPromedio: 25200, // Buen ticket promedio
-    ticketMeta: 23500
+    ticketMeta: 23500,
+    derivacionesDiarias: 5, // Cumple justo
+    derivacionesMeta: 5
   },
   {
     id: 'v4',
@@ -103,7 +110,9 @@ export const VENDEDORES = [
     evaluacionesMeta: 30,
     certificadosEmitidos: 8,
     ticketPromedio: 21500, // Por debajo de meta - requiere mejorar
-    ticketMeta: 23500
+    ticketMeta: 23500,
+    derivacionesDiarias: 3, // NO cumple - crítico
+    derivacionesMeta: 5
   },
   {
     id: 'v5',
@@ -126,7 +135,9 @@ export const VENDEDORES = [
     evaluacionesMeta: 30,
     certificadosEmitidos: 10,
     ticketPromedio: 23800, // Cerca de meta
-    ticketMeta: 23500
+    ticketMeta: 23500,
+    derivacionesDiarias: 7, // Sobre la meta
+    derivacionesMeta: 5
   },
   {
     id: 'v6',
@@ -149,7 +160,9 @@ export const VENDEDORES = [
     evaluacionesMeta: 30,
     certificadosEmitidos: 6,
     ticketPromedio: 19800, // Muy por debajo de meta - CRÍTICO
-    ticketMeta: 23500
+    ticketMeta: 23500,
+    derivacionesDiarias: 2, // MUY por debajo - crítico
+    derivacionesMeta: 5
   }
 ];
 
@@ -206,6 +219,18 @@ export const FUENTES = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
+// DEALERS / CONCESIONARIOS (NUEVO 06-AGO-2026)
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const DEALERS = [
+  { id: 'd1', nombre: 'Autospar San Juan de Lurigancho', ciudad: 'Lima', zona: 'Lima Este' },
+  { id: 'd2', nombre: 'Automotriz del Pacífico - Miraflores', ciudad: 'Lima', zona: 'Lima Centro' },
+  { id: 'd3', nombre: 'ToyotaSur - Surco', ciudad: 'Lima', zona: 'Lima Sur' },
+  { id: 'd4', nombre: 'Motored - San Miguel', ciudad: 'Lima', zona: 'Lima Norte' },
+  { id: 'd5', nombre: 'Breña Motors - Breña', ciudad: 'Lima', zona: 'Lima Centro' }
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
 // ESTADOS DE LEADS
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -248,6 +273,7 @@ export const LEADS = [
       profesion: 'Gerente Comercial'
     },
     fuente: FUENTES.LANDING,
+    dealer: null, // Landing directo, no viene de dealer
     estado: ESTADOS.EN_SEGUIMIENTO,
     vendedorId: 'v1',
     vendedor: 'J. Pérez',
@@ -286,6 +312,7 @@ export const LEADS = [
       profesion: 'Ingeniero de Sistemas'
     },
     fuente: FUENTES.CALLCENTER,
+    dealer: 'Autospar San Juan de Lurigancho', // Derivado de dealer
     estado: ESTADOS.EN_SEGUIMIENTO,
     vendedorId: 'v1',
     vendedor: 'J. Pérez',
@@ -324,6 +351,7 @@ export const LEADS = [
       profesion: 'Contador'
     },
     fuente: FUENTES.LANDING,
+    dealer: null,
     estado: ESTADOS.EN_SEGUIMIENTO,
     vendedorId: 'v1',
     vendedor: 'J. Pérez',
@@ -361,6 +389,7 @@ export const LEADS = [
       profesion: 'Docente'
     },
     fuente: FUENTES.TOYOTA,
+    dealer: 'ToyotaSur - Surco',
     estado: ESTADOS.CONTACTADO,
     vendedorId: 'v1',
     vendedor: 'J. Pérez',
@@ -398,6 +427,7 @@ export const LEADS = [
       profesion: null
     },
     fuente: FUENTES.DERIVACION,
+    dealer: 'Motored - San Miguel',
     estado: ESTADOS.NUEVO,
     vendedorId: 'v1',
     vendedor: 'J. Pérez',
@@ -564,6 +594,103 @@ export const PREGUNTAS_EJECUTIVAS = {
           { texto: 'Ver leads +48h sin contacto', filtro: { diasSinMovimiento: 2 } }
         ]
       };
+    }
+  },
+  // NUEVAS PREGUNTAS (06-AGO-2026)
+  'derivaciones_incumplimiento': {
+    pregunta: '¿Qué dealer no cumple las 5 derivaciones diarias?',
+    respuesta: (data) => {
+      const noCumplen = data.vendedores.filter(v => v.derivacionesDiarias < v.derivacionesMeta);
+      if (noCumplen.length === 0) {
+        return {
+          texto: `✅ Todos los asesores cumplen la meta de 5 derivaciones diarias.`,
+          acciones: []
+        };
+      }
+      const nombres = noCumplen.map(v => `**${v.nombreCompleto}** (${v.derivacionesDiarias}/${v.derivacionesMeta})`).join(', ');
+      return {
+        texto: `⚠️ ${noCumplen.length} asesores no cumplen: ${nombres}. La meta es 5 derivaciones diarias para mantener el flujo comercial.`,
+        acciones: [
+          { texto: 'Ver desempeño completo del equipo', filtro: { metrica: 'derivaciones' } }
+        ]
+      };
+    }
+  },
+  'derivaciones_por_dealer': {
+    pregunta: '¿Cuántas derivaciones hay por dealer?',
+    respuesta: (data) => {
+      // Contar derivaciones por dealer desde los leads
+      const conteo = {};
+      data.leads.forEach(lead => {
+        if (lead.dealer) {
+          conteo[lead.dealer] = (conteo[lead.dealer] || 0) + 1;
+        }
+      });
+      
+      if (Object.keys(conteo).length === 0) {
+        return {
+          texto: `No hay derivaciones registradas de dealers en esta sucursal.`,
+          acciones: []
+        };
+      }
+      
+      const ranking = Object.entries(conteo)
+        .sort((a, b) => b[1] - a[1])
+        .map(([dealer, cant]) => `**${dealer}**: ${cant}`)
+        .join(', ');
+      
+      return {
+        texto: `Derivaciones por dealer: ${ranking}. El dealer con más derivaciones tiene mayor engagement con MAF.`,
+        acciones: [
+          { texto: 'Ver leads por dealer', filtro: { agrupar: 'dealer' } }
+        ]
+      };
+    }
+  },
+  'quien_derivo_deal': {
+    pregunta: '¿Quién derivó este deal?',
+    respuesta: (data) => {
+      // Tomar un ejemplo del lead más reciente con dealer
+      const leadConDealer = data.leads.find(l => l.dealer);
+      if (!leadConDealer) {
+        return {
+          texto: `No hay deals con derivación de dealer en la cartera actual.`,
+          acciones: []
+        };
+      }
+      return {
+        texto: `El lead **${leadConDealer.cliente.nombreCompleto}** fue derivado por **${leadConDealer.dealer}**. Estado actual: ${leadConDealer.estado}.`,
+        acciones: [
+          { texto: 'Ver todos los leads de este dealer', filtro: { dealer: leadConDealer.dealer } }
+        ]
+      };
+    }
+  },
+  'ticket_promedio_vs_meta': {
+    pregunta: '¿Cómo va el ticket promedio vs meta?',
+    respuesta: (data) => {
+      const ticketPromedio = data.vendedores.reduce((sum, v) => sum + v.ticketPromedio, 0) / data.vendedores.length;
+      const meta = data.vendedores[0].ticketMeta; // Asumimos misma meta para todos
+      const diferencia = ticketPromedio - meta;
+      const porcentaje = ((diferencia / meta) * 100).toFixed(1);
+      
+      const vendedoresBajos = data.vendedores.filter(v => v.ticketPromedio < v.ticketMeta);
+      
+      if (diferencia >= 0) {
+        return {
+          texto: `✅ Ticket promedio: **$${ticketPromedio.toLocaleString()}** (meta: $${meta.toLocaleString()}). Estás **${porcentaje}%** sobre la meta. ${vendedoresBajos.length > 0 ? `Pero ${vendedoresBajos.length} asesores están por debajo.` : ''}`,
+          acciones: vendedoresBajos.length > 0 ? [
+            { texto: 'Ver asesores con ticket bajo', filtro: { metrica: 'ticket_bajo' } }
+          ] : []
+        };
+      } else {
+        return {
+          texto: `⚠️ Ticket promedio: **$${ticketPromedio.toLocaleString()}** (meta: $${meta.toLocaleString()}). Estás **${Math.abs(porcentaje)}%** por debajo. **${vendedoresBajos.length}** asesores afectan el promedio: ${vendedoresBajos.map(v => v.nombreCompleto).join(', ')}.`,
+          acciones: [
+            { texto: 'Ver estrategia de upselling', filtro: { metrica: 'ticket_bajo' } }
+          ]
+        };
+      }
     }
   }
 };

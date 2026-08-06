@@ -65,7 +65,7 @@ export function AgenteAsistente({
 
   const getAccionButton = (accion) => {
     const buttons = {
-      'Llamar': { text: 'Enviar WhatsApp de seguimiento', color: 'btn-maf-primary' },
+      'Llamar': { text: '💬 Enviar WhatsApp de seguimiento', color: 'btn-maf-primary' },
       'Ver': { text: 'Ver detalles', color: 'btn-maf-secondary' },
       'Primer contacto': { text: 'Contactar', color: 'btn-maf-primary' }
     };

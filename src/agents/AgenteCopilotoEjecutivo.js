@@ -61,8 +61,8 @@ export function AgenteCopilotoEjecutivo({
   const preguntasSugeridas = rol === 'supervisor' 
     ? [
         '¿Cómo va mi equipo hoy?',
-        '¿Quién es mi mejor y peor vendedor?',
-        '¿Cómo está la conversión?'
+        '¿Qué dealer no cumple las 5 derivaciones diarias?',
+        '¿Cómo va el ticket promedio vs meta?'
       ]
     : [
         '¿Cómo va mi equipo hoy?',
@@ -86,6 +86,19 @@ export function AgenteCopilotoEjecutivo({
     }
     if (preguntaLower.includes('conversión') || preguntaLower.includes('conversion')) {
       return PREGUNTAS_EJECUTIVAS['conversion'];
+    }
+    // NUEVAS PREGUNTAS (06-AGO-2026)
+    if (preguntaLower.includes('derivaciones') && (preguntaLower.includes('cumple') || preguntaLower.includes('dealer'))) {
+      return PREGUNTAS_EJECUTIVAS['derivaciones_incumplimiento'];
+    }
+    if (preguntaLower.includes('derivaciones') && preguntaLower.includes('por dealer')) {
+      return PREGUNTAS_EJECUTIVAS['derivaciones_por_dealer'];
+    }
+    if (preguntaLower.includes('derivó') || preguntaLower.includes('derivo')) {
+      return PREGUNTAS_EJECUTIVAS['quien_derivo_deal'];
+    }
+    if (preguntaLower.includes('ticket') && (preguntaLower.includes('promedio') || preguntaLower.includes('meta'))) {
+      return PREGUNTAS_EJECUTIVAS['ticket_promedio_vs_meta'];
     }
     
     return null;
@@ -162,9 +175,9 @@ export function AgenteCopilotoEjecutivo({
     return React.createElement("button", {
       onClick: () => setIsMinimized(false),
       className: "fixed bottom-6 right-6 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-2xl flex items-center justify-center z-30 transition-all hover:scale-110 border-2 border-blue-400",
-      title: "Abrir Copiloto Ejecutivo"
+      title: "Abrir Asistente MAF"
     },
-      React.createElement("span", { className: "text-2xl" }, "✦")
+      React.createElement("span", { className: "text-xs font-bold" }, "MAF")
     );
   }
 
@@ -185,7 +198,7 @@ export function AgenteCopilotoEjecutivo({
         React.createElement("div", null,
           React.createElement("h3", {
             className: "font-semibold text-sm"
-          }, "Copiloto Ejecutivo"),
+          }, "Asistente MAF"),
           React.createElement("p", {
             className: "text-xs text-blue-200"
           }, "● en línea · especialista en responder cómo va tu negocio")
