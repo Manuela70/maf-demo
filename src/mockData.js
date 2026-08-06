@@ -600,18 +600,30 @@ export const PREGUNTAS_EJECUTIVAS = {
   'derivaciones_incumplimiento': {
     pregunta: '¿Qué dealer no cumple las 5 derivaciones diarias?',
     respuesta: (data) => {
-      const noCumplen = data.vendedores.filter(v => v.derivacionesDiarias < v.derivacionesMeta);
+      // Contar derivaciones por dealer desde los leads
+      const conteo = {};
+      data.leads.forEach(lead => {
+        if (lead.dealer) {
+          conteo[lead.dealer] = (conteo[lead.dealer] || 0) + 1;
+        }
+      });
+      
+      // Meta: 5 derivaciones por dealer
+      const metaDerivaciones = 5;
+      const noCumplen = Object.entries(conteo).filter(([dealer, cant]) => cant < metaDerivaciones);
+      
       if (noCumplen.length === 0) {
         return {
-          texto: `✅ Todos los asesores cumplen la meta de 5 derivaciones diarias.`,
+          texto: `✅ Todos los dealers cumplen la meta de ${metaDerivaciones} derivaciones diarias.`,
           acciones: []
         };
       }
-      const nombres = noCumplen.map(v => `**${v.nombreCompleto}** (${v.derivacionesDiarias}/${v.derivacionesMeta})`).join(', ');
+      
+      const nombres = noCumplen.map(([dealer, cant]) => `**${dealer}** (${cant}/${metaDerivaciones})`).join(', ');
       return {
-        texto: `⚠️ ${noCumplen.length} asesores no cumplen: ${nombres}. La meta es 5 derivaciones diarias para mantener el flujo comercial.`,
+        texto: `⚠️ ${noCumplen.length} dealers no cumplen: ${nombres}. La meta es ${metaDerivaciones} derivaciones diarias para mantener el flujo comercial.`,
         acciones: [
-          { texto: 'Ver desempeño completo del equipo', filtro: { metrica: 'derivaciones' } }
+          { texto: 'Ver derivaciones por dealer', filtro: { agrupar: 'dealer' } }
         ]
       };
     }
