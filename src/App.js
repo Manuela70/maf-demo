@@ -62,11 +62,45 @@ function Screen({
   path,
   pipeline
 }) {
+  const { navigate } = React.useContext(AppContext);
+  
+  // Mapeo de rutas a su pantalla anterior
+  const backRoutes = {
+    '/login': null, // No tiene retroceso
+    '/dashboard': '/login', // Volver al login (para cambiar de usuario en la demo)
+    '/': '/login',
+    '/lead/list': '/dashboard',
+    '/lead/new': '/lead/list',
+    '/lead/1': '/lead/list',
+    '/lead/callcenter': '/dashboard',
+    '/citas': '/dashboard',
+    '/eval': '/lead/1',
+    '/eval/empresa': '/dashboard',
+    '/eval/auto': '/lead/1',
+    '/eval/plaft': '/eval',
+    '/close': '/eval',
+    '/close/dni': '/close',
+    '/close/kashio': '/close/dni',
+    '/close/keynua': '/close/kashio',
+    '/close/contrato': '/close/keynua',
+    '/close/ops': '/dashboard',
+    '/config': '/dashboard',
+    '/templates': '/dashboard'
+  };
+  
+  const backPath = backRoutes[path];
+  const showBackButton = backPath !== undefined && backPath !== null;
+  
   return /*#__PURE__*/React.createElement("div", {
     className: "min-h-screen pt-16"
   }, /*#__PURE__*/React.createElement("div", {
     className: "p-4 max-w-5xl mx-auto"
-  }, pipeline && /*#__PURE__*/React.createElement("div", {
+  }, showBackButton && /*#__PURE__*/React.createElement("button", {
+    onClick: () => navigate(backPath),
+    className: "mb-4 flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors hover:gap-3"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-lg"
+  }, "←"), "Volver"), pipeline && /*#__PURE__*/React.createElement("div", {
     className: "mb-4"
   }, /*#__PURE__*/React.createElement(ProgressPipeline, {
     activeStep: pipeline
