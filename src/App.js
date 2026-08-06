@@ -828,16 +828,25 @@ function P05Dashboard() {
     
     // 2b. Acceso rápido a Mis Citas (NUEVO 05-AGO-2026)
     rol === 'asesor' && !vacío && /*#__PURE__*/React.createElement("div", {
-      className: "mb-6"
+      className: "mb-6 grid grid-cols-2 gap-3"
     },
       /*#__PURE__*/React.createElement("button", {
         onClick: () => navigate('/citas'),
-        className: "w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg text-sm font-semibold hover:from-blue-700 hover:to-blue-800 transition-all flex items-center justify-center gap-2 shadow-md"
+        className: "bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg text-sm font-semibold hover:from-blue-700 hover:to-blue-800 transition-all flex items-center justify-center gap-2 shadow-md"
       }, 
         /*#__PURE__*/React.createElement("span", {
           className: "text-lg"
         }, "📅"),
-        "Ver Mis Citas"
+        "Mis Citas"
+      ),
+      /*#__PURE__*/React.createElement("button", {
+        onClick: () => navigate('/lead/list'),
+        className: "bg-gradient-to-r from-cyan-600 to-cyan-700 text-white py-3 rounded-lg text-sm font-semibold hover:from-cyan-700 hover:to-cyan-800 transition-all flex items-center justify-center gap-2 shadow-md"
+      }, 
+        /*#__PURE__*/React.createElement("span", {
+          className: "text-lg"
+        }, "📋"),
+        "Gestión de Leads"
       )
     ),
     
@@ -851,6 +860,30 @@ function P05Dashboard() {
       },
       className: "mb-6"
     }),
+    
+    // Accesos rápidos para Supervisor (NUEVO 06-AGO-2026)
+    rol === 'supervisor' && !vacío && /*#__PURE__*/React.createElement("div", {
+      className: "mb-6 grid grid-cols-2 gap-3"
+    },
+      /*#__PURE__*/React.createElement("button", {
+        onClick: () => navigate('/lead/list'),
+        className: "bg-gradient-to-r from-cyan-600 to-cyan-700 text-white py-3 rounded-lg text-sm font-semibold hover:from-cyan-700 hover:to-cyan-800 transition-all flex items-center justify-center gap-2 shadow-md"
+      }, 
+        /*#__PURE__*/React.createElement("span", {
+          className: "text-lg"
+        }, "📋"),
+        "Gestión de Leads"
+      ),
+      /*#__PURE__*/React.createElement("button", {
+        onClick: () => navigate('/citas'),
+        className: "bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg text-sm font-semibold hover:from-blue-700 hover:to-blue-800 transition-all flex items-center justify-center gap-2 shadow-md"
+      }, 
+        /*#__PURE__*/React.createElement("span", {
+          className: "text-lg"
+        }, "📅"),
+        "Módulo de Citas"
+      )
+    ),
     
     // NUEVO (05-AGO-2026): Dashboard consolidado del supervisor
     rol === 'supervisor' && !vacío && /*#__PURE__*/React.createElement("div", {
