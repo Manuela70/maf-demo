@@ -1055,7 +1055,7 @@ function PGLGestionLeads() {
   const rol = demoState.currentRole;
   const esSup = ['supervisor', 'jefe_ventas'].includes(rol);
   const [filtro, setFiltro] = React.useState('');
-  const [filtroDealer, setFiltroDealer] = React.useState(''); // NUEVO 06-AGO-2026
+  const [filtroDealer, setFiltroDealer] = React.useState('');
   const [tab, setTab] = React.useState('lista');
   const [leadsPriorizados, setLeadsPriorizados] = React.useState(null);
   
@@ -1129,7 +1129,6 @@ function PGLGestionLeads() {
   
   // Usar leads priorizados si están disponibles, sino los originales
   const leadsAMostrar = leadsPriorizados || LEADS;
-  // Filtrado múltiple: por estado y por dealer (NUEVO 06-AGO-2026)
   let leads = leadsAMostrar;
   if (filtro) leads = leads.filter(l => l.estado === filtro);
   if (filtroDealer) leads = leads.filter(l => l.dealer === filtroDealer);
@@ -1171,7 +1170,13 @@ function PGLGestionLeads() {
     key: t,
     onClick: () => setTab(t),
     className: 'px-5 py-2 text-sm border-b-2 ' + (tab === t ? 'border-gray-800 text-gray-800 font-semibold' : 'border-transparent text-gray-500')
-  }, t === 'lista' ? 'Lista de leads' : 'Vista funnel'))), tab === 'lista' && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+  }, t === 'lista' ? 'Lista de leads' : 'Vista funnel'))), /*#__PURE__*/React.createElement("div", {
+    className: "bg-blue-50 border border-blue-200 rounded p-3 mb-4 text-xs text-blue-800"
+  }, /*#__PURE__*/React.createElement("strong", null, "\uD83D\uDFE1 Estados Macro Call Center (18/06):"), " El sistema implementa 2 estados macro para Call Center:", /*#__PURE__*/React.createElement("ul", {
+    className: "list-disc ml-4 mt-1 space-y-0.5"
+  }, /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "CONTACTADO"), " (macro) despliega: En seguimiento | Descartado | Venta en tr\xE1mite | Venta cerrada"), /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "NO CONTACTADO"), " (macro) despliega: Tel\xE9fono incorrecto | No contesta")), /*#__PURE__*/React.createElement("p", {
+    className: "mt-2"
+  }, "Al hacer click en \"Contactado\" o \"No contactado\" se despliegan los sub-estados disponibles para clasificaci\xF3n granular.")), tab === 'lista' && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     className: "flex gap-2 mb-4 items-center"
   }, /*#__PURE__*/React.createElement("select", {
     className: "text-sm border border-gray-300 rounded px-3 py-1.5 bg-white",
@@ -1182,10 +1187,7 @@ function PGLGestionLeads() {
   }, "Todos los estados"), ESTADOS.map(e => /*#__PURE__*/React.createElement("option", {
     key: e,
     value: e
-  }, e))), 
-  
-  // NUEVO: Filtro por dealer (06-AGO-2026)
-  /*#__PURE__*/React.createElement("select", {
+  }, e))), /*#__PURE__*/React.createElement("select", {
     className: "text-sm border border-gray-300 rounded px-3 py-1.5 bg-white",
     value: filtroDealer,
     onChange: e => setFiltroDealer(e.target.value)
@@ -1194,16 +1196,11 @@ function PGLGestionLeads() {
   }, "Todos los dealers"), dealersUnicos.map(d => /*#__PURE__*/React.createElement("option", {
     key: d,
     value: d
-  }, d))),
-  
-  esSup && /*#__PURE__*/React.createElement("select", {
+  }, d))), esSup && /*#__PURE__*/React.createElement("select", {
     className: "text-sm border border-gray-300 rounded px-3 py-1.5 bg-white"
   }, /*#__PURE__*/React.createElement("option", null, "Todos los asesores"), /*#__PURE__*/React.createElement("option", null, "M. L\xF3pez"), /*#__PURE__*/React.createElement("option", null, "R. Garc\xEDa")), /*#__PURE__*/React.createElement("span", {
     className: "text-xs text-gray-400 ml-auto"
-  }, leads.length, " leads"),
-  
-  // NUEVO: Botón de exportar (06-AGO-2026)
-  /*#__PURE__*/React.createElement("button", {
+  }, leads.length, " leads"), /*#__PURE__*/React.createElement("button", {
     onClick: () => {
       alert(`📥 Exportando ${leads.length} leads a Excel...\n\nFiltros aplicados:\n- Estado: ${filtro || 'Todos'}\n- Dealer: ${filtroDealer || 'Todos'}\n\n(En producción se descargaría como archivo CSV/Excel)`);
     },
@@ -1417,6 +1414,8 @@ function PGLCallCenter() {
   }, "\uD83D\uDFE1 Call Center \u2014 Tracking de Derivaciones"), /*#__PURE__*/React.createElement("p", {
     className: "text-xs text-gray-500 mt-0.5"
   }, "M\xF3dulo de seguimiento espec\xEDfico para operadores de Call Center con registro obligatorio de notas")), /*#__PURE__*/React.createElement("div", {
+    className: "note bg-blue-50 border-l-4 border-blue-400 mb-4 text-xs text-blue-800"
+  }, /*#__PURE__*/React.createElement("strong", null, "RF-GL-CC-01:"), " El m\xF3dulo de Call Center extiende la m\xE1quina de estados general con estados espec\xEDficos de gesti\xF3n comercial. Cada lead cuenta con un ", /*#__PURE__*/React.createElement("strong", null, "m\xF3dulo de notas obligatorio"), " para registrar observaciones, intentos de contacto y contexto."), /*#__PURE__*/React.createElement("div", {
     className: "flex gap-2 mb-4 items-center"
   }, /*#__PURE__*/React.createElement("select", {
     className: "text-sm border border-gray-300 rounded px-3 py-1.5 bg-white",
@@ -4302,6 +4301,8 @@ function P22ScanDNI() {
   }, /*#__PURE__*/React.createElement("h1", {
     className: "text-lg font-bold text-gray-900 mb-4"
   }, "P22 \u2014 Captura de DNI \u26A1"), /*#__PURE__*/React.createElement("div", {
+    className: "mb-4 p-3 bg-blue-50 border-l-4 border-blue-400 text-xs text-blue-800"
+  }, "Esta captura es ", /*#__PURE__*/React.createElement("strong", null, "OPCIONAL"), " en este paso (solo se necesita el n\xFAmero de doc para Kashio). Es ", /*#__PURE__*/React.createElement("strong", null, "OBLIGATORIA"), " antes de disparar la firma Keynua."), /*#__PURE__*/React.createElement("div", {
     className: "bg-white border border-gray-200 rounded shadow-sm p-6"
   }, /*#__PURE__*/React.createElement("p", {
     className: "text-sm text-gray-600 mb-4"
@@ -4452,7 +4453,9 @@ function P23Payment() {
     className: "w-full border border-gray-300 rounded px-3 py-2 text-sm"
   }), /*#__PURE__*/React.createElement("div", {
     className: "note bg-yellow-50 border-l-4 border-yellow-400 mt-2 text-xs text-yellow-800"
-  }, "\u26A0 Pago Parcial: el flujo completo (Keynua, contrato) se activa solo cuando el pago total est\xE9 completo.")), /*#__PURE__*/React.createElement("button", {
+  }, "\u26A0 Pago Parcial: el flujo completo (Keynua, contrato) se activa solo cuando el pago total est\xE9 completo."), /*#__PURE__*/React.createElement("div", {
+    className: "p-2 bg-blue-50 border border-blue-200 rounded mt-2 text-xs text-blue-800"
+  }, "\uD83D\uDFE1 18/06: Cuota 1 se debe pagar \xEDntegra obligatoriamente. La CIA puede pagarse desde 1 USD sin m\xEDnimo."))), /*#__PURE__*/React.createElement("button", {
     onClick: () => setEstado(montoCompleto ? 'generada' : 'pago_cuenta'),
     className: "w-full bg-gray-800 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700"
   }, "Generar orden en Kashio \u2192")), estado === 'generada' && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
@@ -5936,7 +5939,9 @@ function AdminPlantillas() {
   }, p.variables.map(v => /*#__PURE__*/React.createElement("code", {
     key: v,
     className: "text-xs bg-gray-100 border border-gray-200 rounded px-2 py-0.5 text-gray-700 font-mono"
-  }, v))), p.dinamica && null))))), /*#__PURE__*/React.createElement("div", {
+  }, v))), p.dinamica && /*#__PURE__*/React.createElement("div", {
+    className: "mt-2 note bg-blue-50 border-l-4 border-blue-400 text-xs text-blue-800"
+  }, "Plantilla din\xE1mica: el sistema arma el documento con ifs seg\xFAn los datos del prospecto (multicertificado, co-titular, PJ, etc.) \u2014 como en SGC."))))), /*#__PURE__*/React.createElement("div", {
     className: "space-y-1"
   }, /*#__PURE__*/React.createElement(AnnotationNote, {
     type: "rule",
